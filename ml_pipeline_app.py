@@ -980,11 +980,15 @@ elif st.session_state.step == 7:
                 # Encode target if classification
                 le = None
                 if pt == "Classification":
-                    if ys.dtype == object:
+                    if not pd.api.types.is_numeric_dtype(ys):
                         le = LabelEncoder()
-                        ys = le.fit_transform(ys)
+                        ys = le.fit_transform(ys.astype(str))
                     else:
-                        ys = ys.astype(int)
+                        try:
+                            ys = ys.astype(int)
+                        except (ValueError, TypeError):
+                            le = LabelEncoder()
+                            ys = le.fit_transform(ys.astype(str))
 
                 # Build model
                 kernel = st.session_state.get("svm_kernel", "rbf")
@@ -1098,7 +1102,7 @@ elif st.session_state.step == 8:
     if model is None or X_train is None:
         st.warning("Please train a model first.")
     else:
-        from sklearn.preprocessing import StandardScaler
+        from sklearn.preprocessing import StandardScaler, LabelEncoder
         sc = StandardScaler()
         X_train_s = sc.fit_transform(X_train.fillna(0))
         X_test_s = sc.transform(X_test.fillna(0))
@@ -1107,8 +1111,21 @@ elif st.session_state.step == 8:
         y_test_raw = y_test.fillna(0)
 
         if pt == "Classification" and le is not None:
-            y_train_enc = le.transform(y_train_raw.astype(str)) if hasattr(le,'transform') else y_train_raw.astype(int)
-            y_test_enc  = le.transform(y_test_raw.astype(str))  if hasattr(le,'transform') else y_test_raw.astype(int)
+            y_train_enc = le.transform(y_train_raw.astype(str))
+            y_test_enc  = le.transform(y_test_raw.astype(str))
+        elif pt == "Classification":
+            if not pd.api.types.is_numeric_dtype(y_train_raw):
+                _le = LabelEncoder()
+                y_train_enc = _le.fit_transform(y_train_raw.astype(str))
+                y_test_enc  = _le.transform(y_test_raw.astype(str))
+            else:
+                try:
+                    y_train_enc = y_train_raw.astype(int)
+                    y_test_enc  = y_test_raw.astype(int)
+                except (ValueError, TypeError):
+                    _le = LabelEncoder()
+                    y_train_enc = _le.fit_transform(y_train_raw.astype(str))
+                    y_test_enc  = _le.transform(y_test_raw.astype(str))
         else:
             y_train_enc = y_train_raw
             y_test_enc  = y_test_raw
@@ -1229,10 +1246,17 @@ elif st.session_state.step == 9:
         X_train_s = sc.fit_transform(X_train.fillna(0))
         y_train_raw = y_train.fillna(0)
         if pt == "Classification" and le is not None:
-            try:
-                y_enc = le.transform(y_train_raw.astype(str))
-            except:
-                y_enc = y_train_raw.astype(int)
+            y_enc = le.transform(y_train_raw.astype(str))
+        elif pt == "Classification":
+            if not pd.api.types.is_numeric_dtype(y_train_raw):
+                _le2 = LabelEncoder()
+                y_enc = _le2.fit_transform(y_train_raw.astype(str))
+            else:
+                try:
+                    y_enc = y_train_raw.astype(int)
+                except (ValueError, TypeError):
+                    _le2 = LabelEncoder()
+                    y_enc = _le2.fit_transform(y_train_raw.astype(str))
         else:
             y_enc = y_train_raw
 
