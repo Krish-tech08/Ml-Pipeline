@@ -473,8 +473,7 @@ elif st.session_state.step == 2:
 
         # Summary stats
         with st.expander("📊 Descriptive Statistics", expanded=True):
-            st.dataframe(df.describe().T.style.background_gradient(cmap='YlOrRd', axis=0),
-                         use_container_width=True)
+            st.dataframe(df.describe().T, use_container_width=True)
 
         tab1, tab2, tab3, tab4 = st.tabs(["📉 Distributions", "🔗 Correlation", "❓ Missing Data", "🎯 Target Analysis"])
 
@@ -655,9 +654,10 @@ elif st.session_state.step == 3:
 
                 # Viz
                 if len(feat_for_outlier) >= 2:
-                    is_out = df.index.isin(outlier_idx)
+                    is_out = pd.Series(df.index.isin(outlier_idx), index=df.index)
+                    color_labels = is_out.map({True:"Outlier", False:"Normal"})
                     fig = px.scatter(df, x=feat_for_outlier[0], y=feat_for_outlier[1],
-                                     color=is_out.map({True:"Outlier", False:"Normal"}),
+                                     color=color_labels,
                                      color_discrete_map={"Outlier":"#ff6b6b","Normal":"#00d4aa"},
                                      template="plotly_dark",
                                      title=f"Outliers via {outlier_method}")
