@@ -44,7 +44,15 @@ html, body, [data-testid="stAppViewContainer"] {
     font-family: 'Inter', sans-serif !important;
 }
 
-p, span, div, label, li, h1, h2, h3, h4, h5, h6 {
+/* Only target streamlit native elements, NOT SVG inside plotly */
+[data-testid="stAppViewContainer"] > * p,
+[data-testid="stAppViewContainer"] > * span:not(.legend-label):not(.xtick):not(.ytick),
+[data-testid="stAppViewContainer"] > * label,
+[data-testid="stAppViewContainer"] > * li {
+    color: var(--text);
+}
+
+h1, h2, h3, h4, h5, h6 {
     color: var(--text);
 }
 
@@ -271,6 +279,19 @@ p, span, div, label, li, h1, h2, h3, h4, h5, h6 {
 }
 
 hr { border-color: var(--border) !important; }
+
+/* Ensure Plotly SVG text is always visible - do NOT override plotly internals via CSS */
+[data-testid="stPlotlyChart"] svg text {
+    fill: #1a2332 !important;
+}
+[data-testid="stPlotlyChart"] svg .xtick text,
+[data-testid="stPlotlyChart"] svg .ytick text,
+[data-testid="stPlotlyChart"] svg .gtitle,
+[data-testid="stPlotlyChart"] svg .g-xtitle text,
+[data-testid="stPlotlyChart"] svg .g-ytitle text,
+[data-testid="stPlotlyChart"] svg .legendtext {
+    fill: #1a2332 !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -420,13 +441,34 @@ st.markdown("""
 render_stepper(st.session_state.step)
 
 # ── Plotly theme ───────────────────────────────────────────────────────────────
+# Explicit font settings ensure labels/tick text always render clearly
 PLOTLY_LAYOUT = dict(
     paper_bgcolor='rgba(255,255,255,1)',
     plot_bgcolor='rgba(248,251,254,1)',
-    font_color='#1a2332',
-    font_family='Inter',
+    font=dict(color='#1a2332', family='Inter, sans-serif', size=12),
 )
 COLORS = ["#1a6fa8", "#0e8c6a", "#b8860b", "#c0392b", "#5b4fcf", "#0891b2"]
+
+def apply_axis_style(fig, xaxis_title="", yaxis_title=""):
+    """Apply consistent axis label and tick styling to a figure."""
+    axis_style = dict(
+        tickfont=dict(color='#1a2332', size=11, family='Inter, sans-serif'),
+        title_font=dict(color='#2d3e50', size=12, family='Inter, sans-serif'),
+        linecolor='#c8d8e8',
+        gridcolor='#e8f0f7',
+        showgrid=True,
+    )
+    fig.update_xaxes(**axis_style, title_text=xaxis_title)
+    fig.update_yaxes(**axis_style, title_text=yaxis_title)
+    fig.update_layout(
+        legend=dict(
+            font=dict(color='#1a2332', size=11, family='Inter, sans-serif'),
+            bgcolor='rgba(255,255,255,0.9)',
+            bordercolor='#c8d8e8',
+            borderwidth=1,
+        )
+    )
+    return fig
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -568,13 +610,13 @@ elif st.session_state.step == 1:
                         y_col = df_sub[target].astype(str)
                         if n_comp == 2:
                             fig = px.scatter(x=comp[:,0], y=comp[:,1], color=y_col,
-                                             labels={"x":"PC1","y":"PC2"},
+                                             labels={"x":"PC1","y":"PC2","color": target},
                                              template="plotly_white",
                                              color_discrete_sequence=COLORS)
                         else:
                             fig = px.scatter_3d(x=comp[:,0], y=comp[:,1], z=comp[:,2],
                                                 color=y_col,
-                                                labels={"x":"PC1","y":"PC2","z":"PC3"},
+                                                labels={"x":"PC1","y":"PC2","z":"PC3","color": target},
                                                 template="plotly_white",
                                                 color_discrete_sequence=COLORS)
                             fig.update_traces(marker_size=3)
@@ -586,6 +628,7 @@ elif st.session_state.step == 1:
                             **PLOTLY_LAYOUT,
                             title=dict(text=f"PCA — {title_ev}", font=dict(color='#1a6fa8', size=13)),
                         )
+                        fig = apply_axis_style(fig, "PC1", "PC2")
                         st.plotly_chart(fig, use_container_width=True)
 
                 if st.button("Continue to EDA →", use_container_width=True):
@@ -656,32 +699,103 @@ elif st.session_state.step == 2:
                 n_cols = 3
                 n_rows = -(-len(cols_to_plot) // n_cols)
                 fig = make_subplots(rows=n_rows, cols=n_cols, subplot_titles=cols_to_plot)
+                # Style subplot titles
+                for ann in fig.layout.annotations:
+                    ann.font = dict(color='#1a2332', size=11, family='Inter, sans-serif')
+
                 for idx, col in enumerate(cols_to_plot):
                     r, c = divmod(idx, n_cols)
-                    fig.add_trace(go.Histogram(x=df[col].dropna(), name=col,
-                                               marker_color=COLORS[idx % len(COLORS)],
-                                               showlegend=False), row=r+1, col=c+1)
-                fig.update_layout(height=300*n_rows, **PLOTLY_LAYOUT, showlegend=False)
+                    fig.add_trace(go.Histogram(
+                        x=df[col].dropna(), name=col,
+                        marker_color=COLORS[idx % len(COLORS)],
+                        showlegend=False,
+                        marker_line=dict(color='white', width=0.5)
+                    ), row=r+1, col=c+1)
+
+                fig.update_layout(
+                    height=300*n_rows,
+                    **PLOTLY_LAYOUT,
+                    showlegend=False,
+                )
+                # Apply axis style to all subplots
+                fig.update_xaxes(
+                    tickfont=dict(color='#1a2332', size=10, family='Inter, sans-serif'),
+                    title_font=dict(color='#2d3e50', size=11),
+                    linecolor='#c8d8e8',
+                    gridcolor='#e8f0f7',
+                )
+                fig.update_yaxes(
+                    tickfont=dict(color='#1a2332', size=10, family='Inter, sans-serif'),
+                    title_font=dict(color='#2d3e50', size=11),
+                    linecolor='#c8d8e8',
+                    gridcolor='#e8f0f7',
+                )
                 st.plotly_chart(fig, use_container_width=True)
 
         with tab2:
             if len(numeric_cols) > 1:
                 corr = df[numeric_cols].corr()
-                fig = px.imshow(corr, text_auto=".2f", aspect="auto",
-                                color_continuous_scale="RdBu_r", zmin=-1, zmax=1,
-                                template="plotly_white")
-                fig.update_layout(height=600, **PLOTLY_LAYOUT)
+                fig = px.imshow(
+                    corr, text_auto=".2f", aspect="auto",
+                    color_continuous_scale="RdBu_r", zmin=-1, zmax=1,
+                    template="plotly_white",
+                )
+                fig.update_layout(
+                    height=600,
+                    **PLOTLY_LAYOUT,
+                    coloraxis_colorbar=dict(
+                        tickfont=dict(color='#1a2332', size=11, family='Inter, sans-serif'),
+                        title=dict(text="Correlation", font=dict(color='#1a2332', size=12)),
+                    )
+                )
+                fig.update_xaxes(
+                    tickfont=dict(color='#1a2332', size=10, family='Inter, sans-serif'),
+                    tickangle=-45,
+                )
+                fig.update_yaxes(
+                    tickfont=dict(color='#1a2332', size=10, family='Inter, sans-serif'),
+                )
+                # Make text_auto values visible
+                fig.update_traces(textfont=dict(color='#1a2332', size=9))
                 st.plotly_chart(fig, use_container_width=True)
 
                 if target in numeric_cols:
                     top_corr = corr[target].drop(target).abs().sort_values(ascending=False).head(10)
-                    fig2 = px.bar(x=top_corr.values, y=top_corr.index, orientation='h',
-                                  color=top_corr.values,
-                                  color_continuous_scale=['#c0392b','#b8860b','#1a6fa8'],
-                                  template="plotly_white",
-                                  labels={"x":"Absolute Correlation","y":""})
-                    fig2.update_layout(height=350, **PLOTLY_LAYOUT,
-                                       title=dict(text="Top correlations with target", font=dict(color='#1a2332')))
+                    # Use marker_color (list) instead of color= to avoid Plotly treating
+                    # a hex-string array as a continuous color scale
+                    bar_colors = ['#1a6fa8' if v >= top_corr.mean() else '#b8860b'
+                                  for v in top_corr.values]
+                    fig2 = go.Figure(go.Bar(
+                        x=top_corr.values,
+                        y=top_corr.index,
+                        orientation='h',
+                        marker_color=bar_colors,
+                        marker_line=dict(color='white', width=0.5),
+                        text=[f"{v:.3f}" for v in top_corr.values],
+                        textposition='outside',
+                        textfont=dict(color='#1a2332', size=11),
+                    ))
+                    fig2.update_layout(
+                        height=350,
+                        **PLOTLY_LAYOUT,
+                        title=dict(
+                            text=f"Top correlations with <b>{target}</b>",
+                            font=dict(color='#1a2332', size=13, family='Inter, sans-serif')
+                        ),
+                        xaxis=dict(
+                            title="Absolute Correlation",
+                            tickfont=dict(color='#1a2332', size=11),
+                            title_font=dict(color='#2d3e50', size=12),
+                            range=[0, min(top_corr.max() * 1.25, 1.0)],
+                            gridcolor='#e8f0f7',
+                        ),
+                        yaxis=dict(
+                            tickfont=dict(color='#1a2332', size=11),
+                            title_font=dict(color='#2d3e50', size=12),
+                            automargin=True,
+                        ),
+                        margin=dict(l=10, r=60, t=50, b=40),
+                    )
                     st.plotly_chart(fig2, use_container_width=True)
 
         with tab3:
@@ -690,11 +804,40 @@ elif st.session_state.step == 2:
             if miss.empty:
                 st.success("✅ No missing values detected!")
             else:
-                fig = px.bar(x=miss.index, y=miss.values,
-                             color=miss.values, color_continuous_scale=["#fde8e6","#c0392b"],
-                             template="plotly_white",
-                             labels={"x":"Column","y":"Missing Count"})
-                fig.update_layout(**PLOTLY_LAYOUT)
+                # Use marker_color list for discrete coloring
+                miss_colors = [
+                    f'rgba(192,57,43,{0.4 + 0.6 * (v / miss.max())})'
+                    for v in miss.values
+                ]
+                fig = go.Figure(go.Bar(
+                    x=miss.index.tolist(),
+                    y=miss.values.tolist(),
+                    marker_color=miss_colors,
+                    marker_line=dict(color='white', width=0.5),
+                    text=[str(v) for v in miss.values],
+                    textposition='outside',
+                    textfont=dict(color='#1a2332', size=11),
+                ))
+                fig.update_layout(
+                    **PLOTLY_LAYOUT,
+                    title=dict(
+                        text="Missing Values per Column",
+                        font=dict(color='#1a2332', size=13)
+                    ),
+                    xaxis=dict(
+                        title="Column",
+                        tickfont=dict(color='#1a2332', size=11),
+                        title_font=dict(color='#2d3e50', size=12),
+                        tickangle=-30,
+                        automargin=True,
+                    ),
+                    yaxis=dict(
+                        title="Missing Count",
+                        tickfont=dict(color='#1a2332', size=11),
+                        title_font=dict(color='#2d3e50', size=12),
+                        gridcolor='#e8f0f7',
+                    ),
+                )
                 st.plotly_chart(fig, use_container_width=True)
                 st.markdown(f"**{len(miss)} columns** have missing values · **{df.isnull().sum().sum():,}** total NaN cells")
 
@@ -703,21 +846,50 @@ elif st.session_state.step == 2:
                 c1, c2 = st.columns(2)
                 with c1:
                     fig = px.histogram(df, x=target, template="plotly_white",
-                                       color_discrete_sequence=["#1a6fa8"])
-                    fig.update_layout(**PLOTLY_LAYOUT,
-                                      title=dict(text=f"Distribution of {target}", font=dict(color='#1a2332')))
+                                       color_discrete_sequence=["#1a6fa8"],
+                                       labels={target: target})
+                    fig.update_layout(
+                        **PLOTLY_LAYOUT,
+                        title=dict(text=f"Distribution of <b>{target}</b>", font=dict(color='#1a2332', size=13)),
+                    )
+                    fig = apply_axis_style(fig, target, "Count")
                     st.plotly_chart(fig, use_container_width=True)
                 with c2:
                     fig = px.box(df, y=target, template="plotly_white",
-                                 color_discrete_sequence=["#0e8c6a"])
-                    fig.update_layout(**PLOTLY_LAYOUT,
-                                      title=dict(text=f"Box Plot — {target}", font=dict(color='#1a2332')))
+                                 color_discrete_sequence=["#0e8c6a"],
+                                 labels={target: target})
+                    fig.update_layout(
+                        **PLOTLY_LAYOUT,
+                        title=dict(text=f"Box Plot — <b>{target}</b>", font=dict(color='#1a2332', size=13)),
+                    )
+                    fig = apply_axis_style(fig, "", target)
                     st.plotly_chart(fig, use_container_width=True)
             else:
-                fig = px.bar(df[target].value_counts(), template="plotly_white",
-                             color_discrete_sequence=["#1a6fa8"])
-                fig.update_layout(**PLOTLY_LAYOUT,
-                                  title=dict(text=f"Class Distribution — {target}", font=dict(color='#1a2332')))
+                vc = df[target].value_counts()
+                fig = go.Figure(go.Bar(
+                    x=vc.index.tolist(),
+                    y=vc.values.tolist(),
+                    marker_color=COLORS[:len(vc)],
+                    text=[str(v) for v in vc.values],
+                    textposition='outside',
+                    textfont=dict(color='#1a2332', size=11),
+                ))
+                fig.update_layout(
+                    **PLOTLY_LAYOUT,
+                    title=dict(text=f"Class Distribution — <b>{target}</b>", font=dict(color='#1a2332', size=13)),
+                    xaxis=dict(
+                        title=target,
+                        tickfont=dict(color='#1a2332', size=11),
+                        title_font=dict(color='#2d3e50', size=12),
+                        tickangle=-30, automargin=True,
+                    ),
+                    yaxis=dict(
+                        title="Count",
+                        tickfont=dict(color='#1a2332', size=11),
+                        title_font=dict(color='#2d3e50', size=12),
+                        gridcolor='#e8f0f7',
+                    ),
+                )
                 st.plotly_chart(fig, use_container_width=True)
 
         col1, col2 = st.columns(2)
@@ -820,14 +992,32 @@ elif st.session_state.step == 3:
 
                 if len(feat_for_outlier) >= 2:
                     is_out = pd.Series(df.index.isin(outlier_idx), index=df.index)
-                    color_labels = is_out.map({True:"Outlier", False:"Normal"})
-                    fig = px.scatter(df, x=feat_for_outlier[0], y=feat_for_outlier[1],
-                                     color=color_labels,
-                                     color_discrete_map={"Outlier":"#c0392b","Normal":"#1a6fa8"},
-                                     template="plotly_white",
-                                     title=f"Outliers via {outlier_method}")
-                    fig.update_layout(**PLOTLY_LAYOUT, height=380,
-                                      title=dict(text=f"Outliers via {outlier_method}", font=dict(color='#1a2332')))
+                    # Build lists of colors for each point directly — avoids color= ambiguity
+                    point_colors = is_out.map({True: "#c0392b", False: "#1a6fa8"})
+                    point_labels = is_out.map({True: "Outlier", False: "Normal"})
+
+                    fig = px.scatter(
+                        df,
+                        x=feat_for_outlier[0],
+                        y=feat_for_outlier[1],
+                        color=point_labels,
+                        color_discrete_map={"Outlier": "#c0392b", "Normal": "#1a6fa8"},
+                        template="plotly_white",
+                        labels={feat_for_outlier[0]: feat_for_outlier[0], feat_for_outlier[1]: feat_for_outlier[1]},
+                    )
+                    fig.update_layout(
+                        **PLOTLY_LAYOUT,
+                        height=380,
+                        title=dict(text=f"Outliers detected via <b>{outlier_method}</b>", font=dict(color='#1a2332', size=13)),
+                        legend=dict(
+                            title=dict(text="Point Type", font=dict(color='#1a2332', size=12)),
+                            font=dict(color='#1a2332', size=11),
+                            bgcolor='rgba(255,255,255,0.9)',
+                            bordercolor='#c8d8e8',
+                            borderwidth=1,
+                        ),
+                    )
+                    fig = apply_axis_style(fig, feat_for_outlier[0], feat_for_outlier[1])
                     st.plotly_chart(fig, use_container_width=True)
 
                 with st.expander("👀 Preview outlier rows"):
@@ -899,13 +1089,53 @@ elif st.session_state.step == 4:
                     removed = [c for c, m in zip(numeric_cols, mask) if not m]
 
                     variances = df[numeric_cols].var().sort_values(ascending=False)
-                    fig = px.bar(x=variances.index, y=variances.values,
-                                 color=(variances >= thresh).map({True:"#1a6fa8", False:"#c0392b"}),
-                                 template="plotly_white",
-                                 labels={"x":"Feature","y":"Variance"})
-                    fig.add_hline(y=thresh, line_dash="dash", line_color="#b8860b",
-                                  annotation_text=f"Threshold={thresh}")
-                    fig.update_layout(**PLOTLY_LAYOUT, showlegend=False, height=380)
+                    # Use marker_color list for clear per-bar coloring
+                    bar_colors = ['#1a6fa8' if v >= thresh else '#c0392b' for v in variances.values]
+                    fig = go.Figure(go.Bar(
+                        x=variances.index.tolist(),
+                        y=variances.values.tolist(),
+                        marker_color=bar_colors,
+                        marker_line=dict(color='white', width=0.5),
+                        text=[f"{v:.2f}" for v in variances.values],
+                        textposition='outside',
+                        textfont=dict(color='#1a2332', size=10),
+                        showlegend=False,
+                    ))
+                    fig.add_hline(
+                        y=thresh, line_dash="dash", line_color="#b8860b", line_width=2,
+                        annotation_text=f"  Threshold = {thresh}",
+                        annotation_font=dict(color='#b8860b', size=11),
+                    )
+                    # Add a manual legend via invisible scatter
+                    fig.add_trace(go.Scatter(
+                        x=[None], y=[None], mode='markers',
+                        marker=dict(color='#1a6fa8', size=10, symbol='square'),
+                        name='Kept', showlegend=True
+                    ))
+                    fig.add_trace(go.Scatter(
+                        x=[None], y=[None], mode='markers',
+                        marker=dict(color='#c0392b', size=10, symbol='square'),
+                        name='Removed', showlegend=True
+                    ))
+                    fig.update_layout(
+                        **PLOTLY_LAYOUT,
+                        showlegend=True,
+                        height=380,
+                        title=dict(text="Feature Variance vs Threshold", font=dict(color='#1a2332', size=13)),
+                        legend=dict(font=dict(color='#1a2332', size=11), bgcolor='rgba(255,255,255,0.9)', bordercolor='#c8d8e8', borderwidth=1),
+                        xaxis=dict(
+                            title="Feature",
+                            tickfont=dict(color='#1a2332', size=10),
+                            title_font=dict(color='#2d3e50', size=12),
+                            tickangle=-30, automargin=True,
+                        ),
+                        yaxis=dict(
+                            title="Variance",
+                            tickfont=dict(color='#1a2332', size=11),
+                            title_font=dict(color='#2d3e50', size=12),
+                            gridcolor='#e8f0f7',
+                        ),
+                    )
                     st.plotly_chart(fig, use_container_width=True)
                     st.info(f"Keeping **{len(selected)}** features · Removing **{len(removed)}**")
                 except Exception as e:
@@ -917,13 +1147,47 @@ elif st.session_state.step == 4:
                 corrs = df[numeric_cols + [target]].corr()[target].drop(target).abs()
                 selected = corrs[corrs >= corr_thresh].index.tolist()
 
-                fig = px.bar(x=corrs.sort_values(ascending=False).index,
-                             y=corrs.sort_values(ascending=False).values,
-                             color=(corrs.sort_values(ascending=False) >= corr_thresh).map({True:"#1a6fa8",False:"#c0392b"}),
-                             template="plotly_white",
-                             labels={"x":"Feature","y":f"|Corr with {target}|"})
-                fig.add_hline(y=corr_thresh, line_dash="dash", line_color="#b8860b")
-                fig.update_layout(**PLOTLY_LAYOUT, showlegend=False, height=380)
+                sorted_corrs = corrs.sort_values(ascending=False)
+                bar_colors = ['#1a6fa8' if v >= corr_thresh else '#c0392b' for v in sorted_corrs.values]
+                fig = go.Figure(go.Bar(
+                    x=sorted_corrs.index.tolist(),
+                    y=sorted_corrs.values.tolist(),
+                    marker_color=bar_colors,
+                    marker_line=dict(color='white', width=0.5),
+                    text=[f"{v:.3f}" for v in sorted_corrs.values],
+                    textposition='outside',
+                    textfont=dict(color='#1a2332', size=10),
+                    showlegend=False,
+                ))
+                fig.add_hline(
+                    y=corr_thresh, line_dash="dash", line_color="#b8860b", line_width=2,
+                    annotation_text=f"  Threshold = {corr_thresh:.2f}",
+                    annotation_font=dict(color='#b8860b', size=11),
+                )
+                fig.add_trace(go.Scatter(x=[None], y=[None], mode='markers',
+                    marker=dict(color='#1a6fa8', size=10, symbol='square'), name='Selected', showlegend=True))
+                fig.add_trace(go.Scatter(x=[None], y=[None], mode='markers',
+                    marker=dict(color='#c0392b', size=10, symbol='square'), name='Excluded', showlegend=True))
+                fig.update_layout(
+                    **PLOTLY_LAYOUT,
+                    showlegend=True,
+                    height=380,
+                    title=dict(text=f"|Correlation| with <b>{target}</b>", font=dict(color='#1a2332', size=13)),
+                    legend=dict(font=dict(color='#1a2332', size=11), bgcolor='rgba(255,255,255,0.9)', bordercolor='#c8d8e8', borderwidth=1),
+                    xaxis=dict(
+                        title="Feature",
+                        tickfont=dict(color='#1a2332', size=10),
+                        title_font=dict(color='#2d3e50', size=12),
+                        tickangle=-30, automargin=True,
+                    ),
+                    yaxis=dict(
+                        title=f"|Corr with {target}|",
+                        tickfont=dict(color='#1a2332', size=11),
+                        title_font=dict(color='#2d3e50', size=12),
+                        range=[0, min(sorted_corrs.max() * 1.25, 1.0)],
+                        gridcolor='#e8f0f7',
+                    ),
+                )
                 st.plotly_chart(fig, use_container_width=True)
                 st.info(f"Keeping **{len(selected)}** features above threshold")
 
@@ -937,7 +1201,7 @@ elif st.session_state.step == 4:
             if st.session_state.problem_type == "Classification":
                 try:
                     mi = mutual_info_classif(X_mi, y_mi, random_state=42)
-                except:
+                except Exception:
                     mi = mutual_info_regression(X_mi, y_mi, random_state=42)
             else:
                 mi = mutual_info_regression(X_mi, y_mi.fillna(0), random_state=42)
@@ -945,11 +1209,40 @@ elif st.session_state.step == 4:
             mi_series = pd.Series(mi, index=numeric_cols).sort_values(ascending=False)
             selected = mi_series.head(top_k).index.tolist()
 
-            fig = px.bar(x=mi_series.index, y=mi_series.values,
-                         color=(mi_series.index.isin(selected)).map({True:"#1a6fa8",False:"#0e8c6a"}),
-                         template="plotly_white",
-                         labels={"x":"Feature","y":"Mutual Information Score"})
-            fig.update_layout(**PLOTLY_LAYOUT, showlegend=False, height=380)
+            bar_colors = ['#1a6fa8' if feat in selected else '#0e8c6a' for feat in mi_series.index]
+            fig = go.Figure(go.Bar(
+                x=mi_series.index.tolist(),
+                y=mi_series.values.tolist(),
+                marker_color=bar_colors,
+                marker_line=dict(color='white', width=0.5),
+                text=[f"{v:.4f}" for v in mi_series.values],
+                textposition='outside',
+                textfont=dict(color='#1a2332', size=10),
+                showlegend=False,
+            ))
+            fig.add_trace(go.Scatter(x=[None], y=[None], mode='markers',
+                marker=dict(color='#1a6fa8', size=10, symbol='square'), name='Top-K Selected', showlegend=True))
+            fig.add_trace(go.Scatter(x=[None], y=[None], mode='markers',
+                marker=dict(color='#0e8c6a', size=10, symbol='square'), name='Not Selected', showlegend=True))
+            fig.update_layout(
+                **PLOTLY_LAYOUT,
+                showlegend=True,
+                height=380,
+                title=dict(text=f"Mutual Information Score (Top {top_k} highlighted)", font=dict(color='#1a2332', size=13)),
+                legend=dict(font=dict(color='#1a2332', size=11), bgcolor='rgba(255,255,255,0.9)', bordercolor='#c8d8e8', borderwidth=1),
+                xaxis=dict(
+                    title="Feature",
+                    tickfont=dict(color='#1a2332', size=10),
+                    title_font=dict(color='#2d3e50', size=12),
+                    tickangle=-30, automargin=True,
+                ),
+                yaxis=dict(
+                    title="Mutual Information Score",
+                    tickfont=dict(color='#1a2332', size=11),
+                    title_font=dict(color='#2d3e50', size=12),
+                    gridcolor='#e8f0f7',
+                ),
+            )
             st.plotly_chart(fig, use_container_width=True)
             st.info(f"Top **{top_k}** features selected")
 
@@ -998,7 +1291,6 @@ elif st.session_state.step == 5:
         test_size = st.slider("Test set size (%)", 10, 40, 20) / 100
         random_state = st.number_input("Random seed", 0, 999, 42)
 
-        # Only offer stratify option for classification
         stratify_requested = st.checkbox(
             "Stratify split (classification)",
             value=(st.session_state.problem_type == "Classification")
@@ -1010,7 +1302,6 @@ elif st.session_state.step == 5:
             X = df_sub[features]
             y = df_sub[target]
 
-            # ── FIX: validate stratify feasibility before using it ──
             strat = None
             if stratify_requested and st.session_state.problem_type == "Classification":
                 if can_stratify(y):
@@ -1050,16 +1341,32 @@ elif st.session_state.step == 5:
             fig = go.Figure(data=[go.Pie(
                 labels=["Train", "Test"],
                 values=[n_train, n_test],
-                marker=dict(colors=["#1a6fa8","#0e8c6a"]),
+                marker=dict(
+                    colors=["#1a6fa8", "#0e8c6a"],
+                    line=dict(color='white', width=2),
+                ),
                 hole=0.55,
                 textinfo="label+percent",
-                textfont_size=14
+                textfont=dict(size=14, color='#1a2332', family='Inter, sans-serif'),
+                insidetextfont=dict(size=13, color='white'),
             )])
-            fig.update_layout(height=320, **PLOTLY_LAYOUT, showlegend=False,
-                              margin=dict(l=0,r=0,t=0,b=0),
-                              annotations=[dict(text=f"{n_train+n_test:,}<br>total",
-                                               x=0.5, y=0.5, showarrow=False,
-                                               font=dict(size=16, color="#1a2332"))])
+            fig.update_layout(
+                height=320,
+                **PLOTLY_LAYOUT,
+                showlegend=True,
+                margin=dict(l=0, r=0, t=0, b=0),
+                legend=dict(
+                    font=dict(color='#1a2332', size=12, family='Inter, sans-serif'),
+                    bgcolor='rgba(255,255,255,0.9)',
+                    bordercolor='#c8d8e8',
+                    borderwidth=1,
+                ),
+                annotations=[dict(
+                    text=f"<b>{n_train+n_test:,}</b><br>total",
+                    x=0.5, y=0.5, showarrow=False,
+                    font=dict(size=16, color="#1a2332", family='Inter, sans-serif')
+                )]
+            )
             st.plotly_chart(fig, use_container_width=True)
 
             c1, c2 = st.columns(2)
@@ -1205,7 +1512,6 @@ elif st.session_state.step == 7:
                             st.success("✅ K-Means clustering complete!")
                             st.rerun()
 
-                        # ── FIX: use StratifiedKFold only when feasible ──
                         unique_counts = pd.Series(ys).value_counts()
                         if (unique_counts >= k).all():
                             cv = StratifiedKFold(n_splits=k, shuffle=True, random_state=42)
@@ -1254,19 +1560,48 @@ elif st.session_state.step == 7:
         cv_scores = st.session_state.cv_scores
         if cv_scores is not None:
             folds = [f"Fold {i+1}" for i in range(len(cv_scores))]
-            mean_score = np.mean(cv_scores)
+            mean_score = float(np.mean(cv_scores))
 
+            bar_colors = ['#1a6fa8' if s >= mean_score else '#0e8c6a' for s in cv_scores]
             fig = go.Figure()
-            fig.add_trace(go.Bar(x=folds, y=cv_scores,
-                                 marker_color=["#1a6fa8" if s >= mean_score else "#0e8c6a" for s in cv_scores],
-                                 text=[f"{s:.4f}" for s in cv_scores],
-                                 textposition="outside"))
-            fig.add_hline(y=mean_score, line_dash="dash", line_color="#b8860b",
-                          annotation_text=f"Mean = {mean_score:.4f}")
-            fig.update_layout(template="plotly_white", height=380,
-                              **PLOTLY_LAYOUT,
-                              title=dict(text="Cross-Validation Scores per Fold", font=dict(color='#1a2332')),
-                              yaxis_title="Score", xaxis_title="")
+            fig.add_trace(go.Bar(
+                x=folds,
+                y=cv_scores,
+                marker_color=bar_colors,
+                marker_line=dict(color='white', width=0.5),
+                text=[f"{s:.4f}" for s in cv_scores],
+                textposition='outside',
+                textfont=dict(color='#1a2332', size=11),
+                showlegend=False,
+            ))
+            fig.add_hline(
+                y=mean_score, line_dash="dash", line_color="#b8860b", line_width=2,
+                annotation_text=f"  Mean = {mean_score:.4f}",
+                annotation_font=dict(color='#b8860b', size=12),
+            )
+            # Legend markers
+            fig.add_trace(go.Scatter(x=[None], y=[None], mode='markers',
+                marker=dict(color='#1a6fa8', size=10, symbol='square'), name='≥ Mean', showlegend=True))
+            fig.add_trace(go.Scatter(x=[None], y=[None], mode='markers',
+                marker=dict(color='#0e8c6a', size=10, symbol='square'), name='< Mean', showlegend=True))
+            fig.update_layout(
+                template="plotly_white",
+                height=380,
+                **PLOTLY_LAYOUT,
+                title=dict(text="Cross-Validation Scores per Fold", font=dict(color='#1a2332', size=13)),
+                legend=dict(font=dict(color='#1a2332', size=11), bgcolor='rgba(255,255,255,0.9)', bordercolor='#c8d8e8', borderwidth=1),
+                xaxis=dict(
+                    title="Fold",
+                    tickfont=dict(color='#1a2332', size=11),
+                    title_font=dict(color='#2d3e50', size=12),
+                ),
+                yaxis=dict(
+                    title="Score",
+                    tickfont=dict(color='#1a2332', size=11),
+                    title_font=dict(color='#2d3e50', size=12),
+                    gridcolor='#e8f0f7',
+                ),
+            )
             st.plotly_chart(fig, use_container_width=True)
 
             c1, c2, c3 = st.columns(3)
@@ -1311,9 +1646,6 @@ elif st.session_state.step == 8:
 
         if pt == "Classification":
             if not pd.api.types.is_numeric_dtype(y_train_raw):
-                # ── FIX: fit LabelEncoder on the union of train+test labels ──
-                # This prevents "unseen labels" errors when test set has
-                # classes not present in the training split.
                 _le = LabelEncoder()
                 all_labels = pd.concat([y_train_raw.astype(str), y_test_raw.astype(str)])
                 _le.fit(all_labels)
@@ -1361,12 +1693,31 @@ elif st.session_state.step == 8:
                     st.success("🟢 Model appears well-fitted.")
 
                 cm = confusion_matrix(y_test_enc, test_preds)
-                fig = px.imshow(cm, text_auto=True, template="plotly_white",
-                                color_continuous_scale=["#e8f0f7","#1a6fa8"],
-                                labels=dict(x="Predicted", y="Actual"),
-                                title="Confusion Matrix")
-                fig.update_layout(**PLOTLY_LAYOUT, height=400,
-                                  title=dict(text="Confusion Matrix", font=dict(color='#1a2332')))
+                fig = px.imshow(
+                    cm, text_auto=True, template="plotly_white",
+                    color_continuous_scale=["#e8f0f7", "#1a6fa8"],
+                    labels=dict(x="Predicted", y="Actual"),
+                )
+                fig.update_layout(
+                    **PLOTLY_LAYOUT,
+                    height=400,
+                    title=dict(text="Confusion Matrix", font=dict(color='#1a2332', size=13)),
+                    xaxis=dict(
+                        title="Predicted",
+                        tickfont=dict(color='#1a2332', size=11),
+                        title_font=dict(color='#2d3e50', size=12),
+                    ),
+                    yaxis=dict(
+                        title="Actual",
+                        tickfont=dict(color='#1a2332', size=11),
+                        title_font=dict(color='#2d3e50', size=12),
+                    ),
+                    coloraxis_colorbar=dict(
+                        tickfont=dict(color='#1a2332', size=11),
+                        title=dict(text="Count", font=dict(color='#1a2332', size=12)),
+                    )
+                )
+                fig.update_traces(textfont=dict(color='#1a2332', size=12))
                 st.plotly_chart(fig, use_container_width=True)
 
                 with st.expander("📋 Classification Report"):
@@ -1394,25 +1745,70 @@ elif st.session_state.step == 8:
                 else:
                     st.success("🟢 Model appears well-fitted.")
 
-                fig = px.scatter(x=y_test_enc, y=test_preds,
-                                 labels={"x":"Actual","y":"Predicted"},
-                                 template="plotly_white",
-                                 color_discrete_sequence=["#1a6fa8"],
-                                 title="Actual vs Predicted")
-                fig.add_shape(type="line", x0=float(y_test_enc.min()), y0=float(y_test_enc.min()),
-                              x1=float(y_test_enc.max()), y1=float(y_test_enc.max()),
-                              line=dict(color="#c0392b", dash="dash"))
-                fig.update_layout(**PLOTLY_LAYOUT, height=400,
-                                  title=dict(text="Actual vs Predicted Healthcare Expenditure", font=dict(color='#1a2332')))
+                # Actual vs Predicted scatter
+                y_test_vals = y_test_enc.values if hasattr(y_test_enc, 'values') else y_test_enc
+                y_min = float(y_test_vals.min())
+                y_max = float(y_test_vals.max())
+
+                fig = go.Figure()
+                fig.add_trace(go.Scatter(
+                    x=y_test_vals,
+                    y=test_preds,
+                    mode='markers',
+                    marker=dict(color='#1a6fa8', size=6, opacity=0.7, line=dict(color='white', width=0.5)),
+                    name='Predictions',
+                ))
+                fig.add_trace(go.Scatter(
+                    x=[y_min, y_max], y=[y_min, y_max],
+                    mode='lines',
+                    line=dict(color='#c0392b', dash='dash', width=2),
+                    name='Perfect Fit',
+                ))
+                fig.update_layout(
+                    **PLOTLY_LAYOUT,
+                    height=400,
+                    title=dict(text="Actual vs Predicted Healthcare Expenditure", font=dict(color='#1a2332', size=13)),
+                    legend=dict(font=dict(color='#1a2332', size=11), bgcolor='rgba(255,255,255,0.9)', bordercolor='#c8d8e8', borderwidth=1),
+                    xaxis=dict(
+                        title="Actual",
+                        tickfont=dict(color='#1a2332', size=11),
+                        title_font=dict(color='#2d3e50', size=12),
+                        gridcolor='#e8f0f7',
+                    ),
+                    yaxis=dict(
+                        title="Predicted",
+                        tickfont=dict(color='#1a2332', size=11),
+                        title_font=dict(color='#2d3e50', size=12),
+                        gridcolor='#e8f0f7',
+                    ),
+                )
                 st.plotly_chart(fig, use_container_width=True)
 
-                residuals = y_test_enc - test_preds
-                fig2 = px.histogram(x=residuals, template="plotly_white",
-                                    color_discrete_sequence=["#0e8c6a"],
-                                    labels={"x":"Residual"},
-                                    title="Residual Distribution")
-                fig2.update_layout(**PLOTLY_LAYOUT, height=320,
-                                   title=dict(text="Residual Distribution", font=dict(color='#1a2332')))
+                # Residuals histogram
+                residuals = y_test_vals - test_preds
+                fig2 = go.Figure(go.Histogram(
+                    x=residuals,
+                    marker_color='#0e8c6a',
+                    marker_line=dict(color='white', width=0.5),
+                    opacity=0.85,
+                    name='Residuals',
+                ))
+                fig2.update_layout(
+                    **PLOTLY_LAYOUT,
+                    height=320,
+                    title=dict(text="Residual Distribution", font=dict(color='#1a2332', size=13)),
+                    xaxis=dict(
+                        title="Residual (Actual − Predicted)",
+                        tickfont=dict(color='#1a2332', size=11),
+                        title_font=dict(color='#2d3e50', size=12),
+                    ),
+                    yaxis=dict(
+                        title="Count",
+                        tickfont=dict(color='#1a2332', size=11),
+                        title_font=dict(color='#2d3e50', size=12),
+                        gridcolor='#e8f0f7',
+                    ),
+                )
                 st.plotly_chart(fig2, use_container_width=True)
 
         except Exception as e:
@@ -1539,16 +1935,47 @@ elif st.session_state.step == 9:
                                 unsafe_allow_html=True)
                     st.dataframe(results[show_cols].head(20), use_container_width=True)
 
-                    fig = px.bar(results.head(15), y="mean_test_score",
-                                 error_y="std_test_score",
-                                 color="mean_test_score",
-                                 color_continuous_scale=["#c0392b","#b8860b","#1a6fa8"],
-                                 template="plotly_white",
-                                 title=f"Top 15 parameter combinations — {scoring}")
-                    fig.update_layout(**PLOTLY_LAYOUT, height=400,
-                                      xaxis_title="Combination #",
-                                      yaxis_title=scoring, showlegend=False,
-                                      title=dict(text=f"Top 15 parameter combinations — {scoring}", font=dict(color='#1a2332')))
+                    top15 = results.head(15).reset_index(drop=True)
+                    fig = go.Figure(go.Bar(
+                        x=list(range(1, len(top15) + 1)),
+                        y=top15["mean_test_score"].values,
+                        error_y=dict(
+                            type='data',
+                            array=top15["std_test_score"].values,
+                            visible=True,
+                            color='#4a6080',
+                        ),
+                        marker=dict(
+                            color=top15["mean_test_score"].values,
+                            colorscale=[[0, '#c0392b'], [0.5, '#b8860b'], [1, '#1a6fa8']],
+                            showscale=True,
+                            colorbar=dict(
+                                title=dict(text=scoring, font=dict(color='#1a2332', size=12)),
+                                tickfont=dict(color='#1a2332', size=11),
+                            ),
+                        ),
+                        text=[f"{v:.4f}" for v in top15["mean_test_score"].values],
+                        textposition='outside',
+                        textfont=dict(color='#1a2332', size=10),
+                    ))
+                    fig.update_layout(
+                        **PLOTLY_LAYOUT,
+                        height=400,
+                        title=dict(text=f"Top 15 parameter combinations — {scoring}", font=dict(color='#1a2332', size=13)),
+                        xaxis=dict(
+                            title="Combination Rank",
+                            tickfont=dict(color='#1a2332', size=11),
+                            title_font=dict(color='#2d3e50', size=12),
+                            tickmode='linear', dtick=1,
+                        ),
+                        yaxis=dict(
+                            title=scoring,
+                            tickfont=dict(color='#1a2332', size=11),
+                            title_font=dict(color='#2d3e50', size=12),
+                            gridcolor='#e8f0f7',
+                        ),
+                        showlegend=False,
+                    )
                     st.plotly_chart(fig, use_container_width=True)
 
                     st.session_state.trained_model = searcher.best_estimator_
