@@ -395,8 +395,8 @@ st.markdown("""
             border-radius:14px;padding:40px 40px 36px;margin-bottom:28px;
             border:1px solid #1a6fa8;position:relative;overflow:hidden;">
     <div style="position:absolute;top:0;right:0;width:300px;height:100%;
-                background:url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 300 200\"><path d=\"M0 100 Q75 40 150 100 T300 100\" stroke=\"rgba(255,255,255,0.06)\" fill=\"none\" stroke-width=\"2\"/><path d=\"M0 130 Q75 70 150 130 T300 130\" stroke=\"rgba(255,255,255,0.04)\" fill=\"none\" stroke-width=\"2\"/><path d=\"M0 70 Q75 10 150 70 T300 70\" stroke=\"rgba(255,255,255,0.04)\" fill=\"none\" stroke-width=\"2\"/></svg>') no-repeat right center;
-                opacity:0.8;pointer-events:none;"></div>
+                background:url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 300 200\"><path d=\"M0 100 Q75 40 150 100 T300 100\" stroke=\"rgba(255,255,255,0.06)\" fill=\"none\" stroke-width=\"2\"/><path d=\"M0 130 Q75 70 150 130 T300 130\" stroke=\"rgba(255,255,255,0.04)\" fill=\"none\" stroke-width=\"2\"/><path d=\"M0 70 Q75 10 150 70 T300 70\" stroke=\"rgba(255,255,255,0.04)\" fill=\"none\" stroke-width=\"2\"/></svg>
+                </div>
     <div style="display:flex;align-items:center;gap:16px;margin-bottom:14px;">
         <div style="width:48px;height:48px;background:rgba(255,255,255,0.15);border-radius:10px;
                     display:flex;align-items:center;justify-content:center;font-size:24px;">🏥</div>
