@@ -359,11 +359,7 @@ def section_header(step_n, title, subtitle=""):
 # ── Helper: check if stratify is feasible ─────────────────────────────────────
 def can_stratify(y):
     """Return True only if every class has at least 2 members."""
-    if not pd.api.types.is_categorical_dtype(y) and not pd.api.types.is_object_dtype(y):
-        # For numeric targets, check value counts
-        counts = pd.Series(y).value_counts()
-    else:
-        counts = pd.Series(y).value_counts()
+    counts = pd.Series(y).value_counts()
     return bool((counts >= 2).all())
 
 
@@ -1301,7 +1297,6 @@ elif st.session_state.step == 8:
     y_train = st.session_state.y_train
     y_test = st.session_state.y_test
     pt = st.session_state.problem_type
-    le = st.session_state.get("label_encoder", None)
 
     if model is None or X_train is None:
         st.warning("Please train a model first.")
@@ -1314,13 +1309,15 @@ elif st.session_state.step == 8:
         y_train_raw = y_train.fillna(0)
         y_test_raw = y_test.fillna(0)
 
-        if pt == "Classification" and le is not None:
-            y_train_enc = le.transform(y_train_raw.astype(str))
-            y_test_enc  = le.transform(y_test_raw.astype(str))
-        elif pt == "Classification":
+        if pt == "Classification":
             if not pd.api.types.is_numeric_dtype(y_train_raw):
+                # ── FIX: fit LabelEncoder on the union of train+test labels ──
+                # This prevents "unseen labels" errors when test set has
+                # classes not present in the training split.
                 _le = LabelEncoder()
-                y_train_enc = _le.fit_transform(y_train_raw.astype(str))
+                all_labels = pd.concat([y_train_raw.astype(str), y_test_raw.astype(str)])
+                _le.fit(all_labels)
+                y_train_enc = _le.transform(y_train_raw.astype(str))
                 y_test_enc  = _le.transform(y_test_raw.astype(str))
             else:
                 try:
@@ -1328,7 +1325,9 @@ elif st.session_state.step == 8:
                     y_test_enc  = y_test_raw.astype(int)
                 except (ValueError, TypeError):
                     _le = LabelEncoder()
-                    y_train_enc = _le.fit_transform(y_train_raw.astype(str))
+                    all_labels = pd.concat([y_train_raw.astype(str), y_test_raw.astype(str)])
+                    _le.fit(all_labels)
+                    y_train_enc = _le.transform(y_train_raw.astype(str))
                     y_test_enc  = _le.transform(y_test_raw.astype(str))
         else:
             y_train_enc = y_train_raw
@@ -1448,9 +1447,7 @@ elif st.session_state.step == 9:
         sc = StandardScaler()
         X_train_s = sc.fit_transform(X_train.fillna(0))
         y_train_raw = y_train.fillna(0)
-        if pt == "Classification" and le is not None:
-            y_enc = le.transform(y_train_raw.astype(str))
-        elif pt == "Classification":
+        if pt == "Classification":
             if not pd.api.types.is_numeric_dtype(y_train_raw):
                 _le2 = LabelEncoder()
                 y_enc = _le2.fit_transform(y_train_raw.astype(str))
