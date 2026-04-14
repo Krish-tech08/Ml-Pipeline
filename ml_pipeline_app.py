@@ -33,7 +33,7 @@ st.markdown("""
     --gold-light: #fdf3d0;
     --text: #1a2332;
     --text-body: #2d3e50;
-    --muted: #5f7a94;
+    --muted: #4a6080;
     --card-bg: #ffffff;
     --header-bg: #0d3b5e;
 }
@@ -42,6 +42,11 @@ html, body, [data-testid="stAppViewContainer"] {
     background: var(--bg) !important;
     color: var(--text) !important;
     font-family: 'Inter', sans-serif !important;
+}
+
+/* ── Global text color fix ── */
+p, span, div, label, li, h1, h2, h3, h4, h5, h6 {
+    color: var(--text);
 }
 
 [data-testid="stAppViewContainer"]::before {
@@ -60,6 +65,7 @@ html, body, [data-testid="stAppViewContainer"] {
     border-right: 1px solid #1a4a6e !important;
 }
 
+/* ── Buttons ── */
 .stButton > button {
     background: var(--accent) !important;
     color: #ffffff !important;
@@ -78,12 +84,30 @@ html, body, [data-testid="stAppViewContainer"] {
     box-shadow: 0 4px 12px rgba(26,111,168,0.25) !important;
 }
 
+/* ── Form elements ── */
 .stSelectbox > div > div,
 .stMultiSelect > div > div {
     background: var(--surface) !important;
     border: 1px solid var(--border) !important;
     border-radius: 6px !important;
     color: var(--text) !important;
+}
+
+/* Dropdown options */
+.stSelectbox div[data-baseweb="select"] > div,
+[data-baseweb="popover"] ul li,
+[data-baseweb="menu"] ul li {
+    background: var(--surface) !important;
+    color: var(--text) !important;
+}
+
+/* Multiselect tags */
+.stMultiSelect span[data-baseweb="tag"] {
+    background: var(--accent-light) !important;
+    color: var(--accent) !important;
+}
+.stMultiSelect span[data-baseweb="tag"] span {
+    color: var(--accent) !important;
 }
 
 .stNumberInput > div > div > input {
@@ -95,21 +119,53 @@ html, body, [data-testid="stAppViewContainer"] {
 
 .stSlider > div > div > div { background: var(--accent) !important; }
 
+/* Slider value labels */
+.stSlider [data-testid="stTickBarMin"],
+.stSlider [data-testid="stTickBarMax"],
+.stSlider .stSlider > label {
+    color: var(--text-body) !important;
+}
+
+/* ── File uploader ── */
 [data-testid="stFileUploader"] {
     background: var(--accent-light) !important;
     border: 2px dashed var(--accent) !important;
     border-radius: 10px !important;
 }
+[data-testid="stFileUploader"] label,
+[data-testid="stFileUploader"] span,
+[data-testid="stFileUploader"] p {
+    color: var(--text-body) !important;
+}
 
+/* ── DataFrame ── */
 [data-testid="stDataFrame"] { border-radius: 8px !important; }
+[data-testid="stDataFrame"] th {
+    background: var(--surface2) !important;
+    color: var(--text) !important;
+}
+[data-testid="stDataFrame"] td {
+    color: var(--text-body) !important;
+}
 
+/* ── Expander ── */
 .streamlit-expanderHeader {
     background: var(--surface2) !important;
     border: 1px solid var(--border) !important;
     border-radius: 6px !important;
     color: var(--text) !important;
 }
+.streamlit-expanderHeader p,
+.streamlit-expanderHeader span {
+    color: var(--text) !important;
+}
+.streamlit-expanderContent {
+    background: var(--surface) !important;
+    border: 1px solid var(--border) !important;
+    border-top: none !important;
+}
 
+/* ── Metrics ── */
 [data-testid="stMetric"] {
     background: var(--surface) !important;
     border: 1px solid var(--border) !important;
@@ -117,11 +173,48 @@ html, body, [data-testid="stAppViewContainer"] {
     border-radius: 8px !important;
     padding: 16px !important;
 }
-[data-testid="stMetricValue"] { color: var(--accent) !important; font-size: 26px !important; font-weight: 700 !important; }
-[data-testid="stMetricLabel"] { color: var(--muted) !important; font-size: 12px !important; text-transform: uppercase !important; letter-spacing: 0.5px !important; }
+[data-testid="stMetricValue"] {
+    color: var(--accent) !important;
+    font-size: 26px !important;
+    font-weight: 700 !important;
+}
+[data-testid="stMetricLabel"] {
+    color: var(--muted) !important;
+    font-size: 12px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+[data-testid="stMetricDelta"] {
+    color: var(--text-body) !important;
+}
 
-hr { border-color: var(--border) !important; }
+/* ── Alert boxes ── */
+.stSuccess, .stSuccess p, .stSuccess span {
+    background: var(--accent2-light) !important;
+    border: 1px solid var(--accent2) !important;
+    border-radius: 6px !important;
+    color: #0a5c44 !important;
+}
+.stWarning, .stWarning p, .stWarning span {
+    background: var(--gold-light) !important;
+    border: 1px solid var(--gold) !important;
+    border-radius: 6px !important;
+    color: #6b4a00 !important;
+}
+.stError, .stError p, .stError span {
+    background: var(--accent3-light) !important;
+    border: 1px solid var(--accent3) !important;
+    border-radius: 6px !important;
+    color: #7b1a13 !important;
+}
+.stInfo, .stInfo p, .stInfo span {
+    background: var(--accent-light) !important;
+    border: 1px solid var(--accent) !important;
+    border-radius: 6px !important;
+    color: #0d3a5c !important;
+}
 
+/* ── Radio buttons ── */
 .stRadio > div { flex-direction: row !important; gap: 12px !important; }
 .stRadio > div > label {
     background: var(--surface) !important;
@@ -132,16 +225,76 @@ hr { border-color: var(--border) !important; }
     transition: all 0.2s !important;
     color: var(--text-body) !important;
 }
-.stRadio > div > label:hover { border-color: var(--accent) !important; background: var(--accent-light) !important; }
+.stRadio > div > label:hover {
+    border-color: var(--accent) !important;
+    background: var(--accent-light) !important;
+}
+/* Radio label text */
+.stRadio label p,
+.stRadio label span {
+    color: var(--text-body) !important;
+}
 
-.stSuccess { background: var(--accent2-light) !important; border: 1px solid var(--accent2) !important; border-radius: 6px !important; color: #0a5c44 !important; }
-.stWarning { background: var(--gold-light) !important; border: 1px solid var(--gold) !important; border-radius: 6px !important; }
-.stError   { background: var(--accent3-light) !important; border: 1px solid var(--accent3) !important; border-radius: 6px !important; }
-.stInfo    { background: var(--accent-light) !important; border: 1px solid var(--accent) !important; border-radius: 6px !important; }
+/* ── Tabs ── */
+.stTabs [data-baseweb="tab-list"] {
+    background: var(--surface2) !important;
+    border-radius: 8px 8px 0 0 !important;
+    border-bottom: 2px solid var(--border) !important;
+}
+.stTabs [data-baseweb="tab"] {
+    color: var(--muted) !important;
+    font-weight: 500 !important;
+}
+.stTabs [aria-selected="true"] {
+    color: var(--accent) !important;
+    background: var(--surface) !important;
+    border-bottom: 2px solid var(--accent) !important;
+}
+.stTabs [data-baseweb="tab-panel"] {
+    background: var(--surface) !important;
+    border: 1px solid var(--border) !important;
+    border-top: none !important;
+    border-radius: 0 0 8px 8px !important;
+    padding: 16px !important;
+}
+
+/* ── Checkboxes ── */
+.stCheckbox label, .stCheckbox span {
+    color: var(--text-body) !important;
+}
+
+/* ── General label/text overrides ── */
+.stSelectbox label, .stMultiSelect label, .stTextInput label,
+.stNumberInput label, .stSlider label, .stFileUploader label,
+.stCheckbox label, .stRadio label, .stTextArea label {
+    color: var(--text-body) !important;
+    font-weight: 500 !important;
+}
+
+/* ── Spinner ── */
+.stSpinner > div {
+    border-color: var(--accent) !important;
+}
+
+/* ── JSON display ── */
+.stJson {
+    background: var(--surface2) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 6px !important;
+}
+
+/* ── Plotly chart container ── */
+[data-testid="stPlotlyChart"] {
+    border-radius: 8px !important;
+    overflow: hidden !important;
+}
+
+hr { border-color: var(--border) !important; }
 </style>
 """, unsafe_allow_html=True)
 
 
+# ── Utility: card wrapper ──────────────────────────────────────────────────────
 def card(content_fn, title="", accent="var(--accent)"):
     st.markdown(f"""
     <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:10px;
@@ -153,6 +306,7 @@ def card(content_fn, title="", accent="var(--accent)"):
     st.markdown("</div>", unsafe_allow_html=True)
 
 
+# ── Stepper ────────────────────────────────────────────────────────────────────
 def step_badge(n, label, done=False, active=False):
     if active:
         bg, col, border = "var(--accent)", "#ffffff", "var(--accent)"
@@ -160,6 +314,10 @@ def step_badge(n, label, done=False, active=False):
         bg, col, border = "var(--accent2-light)", "var(--accent2)", "var(--accent2)"
     else:
         bg, col, border = "var(--surface)", "var(--muted)", "var(--border)"
+
+    # Label color: white on active, accent2 on done, muted on pending
+    label_col = "#ffffff" if active else ("var(--accent2)" if done else "var(--muted)")
+
     return f"""
     <div style="display:flex;flex-direction:column;align-items:center;gap:6px;min-width:90px;">
         <div style="width:38px;height:38px;border-radius:50%;background:{bg};border:2px solid {border};
@@ -167,7 +325,7 @@ def step_badge(n, label, done=False, active=False):
                     font-family:Inter,sans-serif;font-weight:700;font-size:13px;color:{col};">
             {'✓' if done else str(n)}
         </div>
-        <span style="font-size:10px;color:{col};text-align:center;font-weight:600;line-height:1.3;letter-spacing:0.2px;">{label}</span>
+        <span style="font-size:10px;color:{label_col};text-align:center;font-weight:600;line-height:1.3;letter-spacing:0.2px;">{label}</span>
     </div>"""
 
 
@@ -199,6 +357,7 @@ def render_stepper(current_step):
     """, unsafe_allow_html=True)
 
 
+# ── Section header ─────────────────────────────────────────────────────────────
 def section_header(step_n, title, subtitle=""):
     st.markdown(f"""
     <div style="margin-bottom:24px;">
@@ -217,6 +376,7 @@ def section_header(step_n, title, subtitle=""):
     """, unsafe_allow_html=True)
 
 
+# ── Session state defaults ─────────────────────────────────────────────────────
 defaults = dict(
     step=0, problem_type=None, df=None, target=None, features=None,
     df_clean=None, selected_features=None, X_train=None, X_test=None,
@@ -229,7 +389,7 @@ for k, v in defaults.items():
         st.session_state[k] = v
 
 
-# ── HEADER ────────────────────────────────────────────────────────────────────
+# ── Header ─────────────────────────────────────────────────────────────────────
 st.markdown("""
 <div style="background:linear-gradient(135deg,#0d3b5e 0%,#1a6fa8 60%,#0e8c6a 100%);
             border-radius:14px;padding:40px 40px 36px;margin-bottom:28px;
@@ -241,7 +401,7 @@ st.markdown("""
         <div style="width:48px;height:48px;background:rgba(255,255,255,0.15);border-radius:10px;
                     display:flex;align-items:center;justify-content:center;font-size:24px;">🏥</div>
         <div>
-            <div style="font-family:Inter,sans-serif;font-size:10px;color:rgba(255,255,255,0.6);
+            <div style="font-family:Inter,sans-serif;font-size:10px;color:rgba(255,255,255,0.7);
                         letter-spacing:3px;text-transform:uppercase;margin-bottom:4px;">
                 AutoML Platform · Healthcare Finance Analytics
             </div>
@@ -250,20 +410,20 @@ st.markdown("""
             </h1>
         </div>
     </div>
-    <p style="color:rgba(255,255,255,0.7);font-size:14px;margin:0;max-width:500px;">
+    <p style="color:rgba(255,255,255,0.8);font-size:14px;margin:0;max-width:500px;">
         End-to-end machine learning for healthcare expenditure analysis — from raw data to tuned predictive model
     </p>
-    <div style="display:flex;gap:24px;margin-top:20px;">
-        <div style="background:rgba(255,255,255,0.1);border-radius:6px;padding:8px 16px;
-                    font-size:12px;color:rgba(255,255,255,0.85);font-weight:500;">
+    <div style="display:flex;gap:24px;margin-top:20px;flex-wrap:wrap;">
+        <div style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:6px;padding:8px 16px;
+                    font-size:12px;color:rgba(255,255,255,0.95);font-weight:500;">
             💊 Clinical Cost Modeling
         </div>
-        <div style="background:rgba(255,255,255,0.1);border-radius:6px;padding:8px 16px;
-                    font-size:12px;color:rgba(255,255,255,0.85);font-weight:500;">
+        <div style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:6px;padding:8px 16px;
+                    font-size:12px;color:rgba(255,255,255,0.95);font-weight:500;">
             📊 Expenditure Forecasting
         </div>
-        <div style="background:rgba(255,255,255,0.1);border-radius:6px;padding:8px 16px;
-                    font-size:12px;color:rgba(255,255,255,0.85);font-weight:500;">
+        <div style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:6px;padding:8px 16px;
+                    font-size:12px;color:rgba(255,255,255,0.95);font-weight:500;">
             🌐 Global Health Metrics
         </div>
     </div>
@@ -272,8 +432,9 @@ st.markdown("""
 
 render_stepper(st.session_state.step)
 
+# ── Plotly theme ───────────────────────────────────────────────────────────────
 PLOTLY_LAYOUT = dict(
-    paper_bgcolor='rgba(0,0,0,0)',
+    paper_bgcolor='rgba(255,255,255,1)',
     plot_bgcolor='rgba(248,251,254,1)',
     font_color='#1a2332',
     font_family='Inter',
@@ -297,13 +458,14 @@ if st.session_state.step == 0:
         with c1:
             active_cls = "var(--accent)" if choice == "Classification" else "var(--border)"
             bg_cls = "var(--accent-light)" if choice == "Classification" else "var(--surface)"
+            text_cls = "var(--accent)" if choice == "Classification" else "var(--text)"
             st.markdown(f"""
             <div style="background:{bg_cls};border:2px solid {active_cls};border-radius:10px;
                         padding:24px;text-align:center;">
                 <div style="width:48px;height:48px;background:var(--accent);border-radius:8px;
                             display:flex;align-items:center;justify-content:center;
                             font-size:22px;margin:0 auto 12px;">🎯</div>
-                <div style="font-weight:700;color:var(--text);font-size:16px;margin-bottom:8px;">Classification</div>
+                <div style="font-weight:700;color:{text_cls};font-size:16px;margin-bottom:8px;">Classification</div>
                 <div style="color:var(--muted);font-size:13px;line-height:1.5;">
                     Predict discrete outcomes such as high/low cost risk categories
                 </div>
@@ -314,13 +476,14 @@ if st.session_state.step == 0:
         with c2:
             active_reg = "var(--accent2)" if choice == "Regression" else "var(--border)"
             bg_reg = "var(--accent2-light)" if choice == "Regression" else "var(--surface)"
+            text_reg = "var(--accent2)" if choice == "Regression" else "var(--text)"
             st.markdown(f"""
             <div style="background:{bg_reg};border:2px solid {active_reg};border-radius:10px;
                         padding:24px;text-align:center;">
                 <div style="width:48px;height:48px;background:var(--accent2);border-radius:8px;
                             display:flex;align-items:center;justify-content:center;
                             font-size:22px;margin:0 auto 12px;">📈</div>
-                <div style="font-weight:700;color:var(--text);font-size:16px;margin-bottom:8px;">Regression</div>
+                <div style="font-weight:700;color:{text_reg};font-size:16px;margin-bottom:8px;">Regression</div>
                 <div style="color:var(--muted);font-size:13px;line-height:1.5;">
                     Forecast continuous values like per-capita health expenditure
                 </div>
@@ -454,17 +617,17 @@ elif st.session_state.step == 1:
                 DATASET GUIDE
             </div>
             <div style="font-size:13px;color:var(--text-body);line-height:1.8;">
-                <div style="background:var(--accent-light);border-radius:6px;padding:12px;margin-bottom:12px;">
-                    <b style="color:var(--accent);">📂 Financing Healthcare</b><br>
-                    <span style="color:var(--muted);font-size:12px;">OWID dataset by Ortiz-Ospina & Roser — global health expenditure indicators</span>
+                <div style="background:var(--accent-light);border:1px solid #b3d4ec;border-radius:6px;padding:12px;margin-bottom:12px;">
+                    <b style="color:#0d3b5e;">📂 Financing Healthcare</b><br>
+                    <span style="color:#2d5a7a;font-size:12px;">OWID dataset by Ortiz-Ospina &amp; Roser — global health expenditure indicators</span>
                 </div>
-                <div style="background:var(--gold-light);border-radius:6px;padding:12px;margin-bottom:12px;">
-                    <b style="color:var(--gold);">🎯 Recommended targets</b><br>
-                    <span style="color:var(--muted);font-size:12px;">che_gdp · che_pc_usd · gghed_che</span>
+                <div style="background:var(--gold-light);border:1px solid #d4a82a;border-radius:6px;padding:12px;margin-bottom:12px;">
+                    <b style="color:#5a3c00;">🎯 Recommended targets</b><br>
+                    <span style="color:#6b4a00;font-size:12px;">che_gdp · che_pc_usd · gghed_che</span>
                 </div>
-                <div style="background:var(--accent2-light);border-radius:6px;padding:12px;">
-                    <b style="color:var(--accent2);">💡 Tip</b><br>
-                    <span style="color:var(--muted);font-size:12px;">Drop identifier columns like 'country' before modeling to avoid data leakage.</span>
+                <div style="background:var(--accent2-light);border:1px solid #6ec9a8;border-radius:6px;padding:12px;">
+                    <b style="color:#055c3f;">💡 Tip</b><br>
+                    <span style="color:#0a5c44;font-size:12px;">Drop identifier columns like 'country' before modeling to avoid data leakage.</span>
                 </div>
                 <hr style="border-color:var(--border);margin:16px 0;">
                 <div style="font-size:12px;color:var(--muted);">
@@ -531,7 +694,7 @@ elif st.session_state.step == 2:
                                   template="plotly_white",
                                   labels={"x":"Absolute Correlation","y":""})
                     fig2.update_layout(height=350, **PLOTLY_LAYOUT,
-                                       title=dict(text="Top correlations with target",font=dict(color='#1a2332')))
+                                       title=dict(text="Top correlations with target", font=dict(color='#1a2332')))
                     st.plotly_chart(fig2, use_container_width=True)
 
         with tab3:
@@ -555,19 +718,19 @@ elif st.session_state.step == 2:
                     fig = px.histogram(df, x=target, template="plotly_white",
                                        color_discrete_sequence=["#1a6fa8"])
                     fig.update_layout(**PLOTLY_LAYOUT,
-                                      title=dict(text=f"Distribution of {target}",font=dict(color='#1a2332')))
+                                      title=dict(text=f"Distribution of {target}", font=dict(color='#1a2332')))
                     st.plotly_chart(fig, use_container_width=True)
                 with c2:
                     fig = px.box(df, y=target, template="plotly_white",
                                  color_discrete_sequence=["#0e8c6a"])
                     fig.update_layout(**PLOTLY_LAYOUT,
-                                      title=dict(text=f"Box Plot — {target}",font=dict(color='#1a2332')))
+                                      title=dict(text=f"Box Plot — {target}", font=dict(color='#1a2332')))
                     st.plotly_chart(fig, use_container_width=True)
             else:
                 fig = px.bar(df[target].value_counts(), template="plotly_white",
                              color_discrete_sequence=["#1a6fa8"])
                 fig.update_layout(**PLOTLY_LAYOUT,
-                                  title=dict(text=f"Class Distribution — {target}",font=dict(color='#1a2332')))
+                                  title=dict(text=f"Class Distribution — {target}", font=dict(color='#1a2332')))
                 st.plotly_chart(fig, use_container_width=True)
 
         col1, col2 = st.columns(2)
@@ -677,7 +840,7 @@ elif st.session_state.step == 3:
                                      template="plotly_white",
                                      title=f"Outliers via {outlier_method}")
                     fig.update_layout(**PLOTLY_LAYOUT, height=380,
-                                      title=dict(text=f"Outliers via {outlier_method}",font=dict(color='#1a2332')))
+                                      title=dict(text=f"Outliers via {outlier_method}", font=dict(color='#1a2332')))
                     st.plotly_chart(fig, use_container_width=True)
 
                 with st.expander("👀 Preview outlier rows"):
@@ -813,9 +976,9 @@ elif st.session_state.step == 4:
         """, unsafe_allow_html=True)
         for feat in selected:
             st.markdown(f"""
-            <div style="background:var(--accent-light);border:1px solid var(--border);
+            <div style="background:var(--accent-light);border:1px solid #b3d4ec;
                         border-radius:6px;padding:7px 12px;margin-bottom:6px;
-                        font-size:13px;color:var(--accent);font-weight:500;">
+                        font-size:13px;color:#0d3b5e;font-weight:500;">
                 ✓ {feat}
             </div>""", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
@@ -935,14 +1098,18 @@ elif st.session_state.step == 6:
             active = selected_model == name
             border = "var(--accent)" if active else "var(--border)"
             bg = "var(--accent-light)" if active else "var(--surface)"
+            # Text color: dark on accent-light, muted on surface
+            desc_color = "#0d3b5e" if active else "var(--muted)"
+            badge_text = f'<span style="color:var(--accent);font-weight:600;">✓ Selected</span>' if active else f'<span style="color:{desc_color};">{desc}</span>'
+
             if st.button(f"{icon} {name}", key=f"model_{i}", use_container_width=True):
                 st.session_state.model_name = name
                 st.rerun()
             st.markdown(f"""
             <div style="background:{bg};border:2px solid {border};border-radius:8px;
-                        padding:10px;text-align:center;margin-top:-8px;font-size:12px;color:var(--muted);
+                        padding:10px;text-align:center;margin-top:-8px;font-size:12px;
                         line-height:1.5;">
-                {'<span style="color:var(--accent);font-weight:600;">✓ Selected</span>' if active else desc}
+                {badge_text}
             </div>""", unsafe_allow_html=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
@@ -1079,7 +1246,7 @@ elif st.session_state.step == 7:
                           annotation_text=f"Mean = {mean_score:.4f}")
             fig.update_layout(template="plotly_white", height=380,
                               **PLOTLY_LAYOUT,
-                              title=dict(text="Cross-Validation Scores per Fold",font=dict(color='#1a2332')),
+                              title=dict(text="Cross-Validation Scores per Fold", font=dict(color='#1a2332')),
                               yaxis_title="Score", xaxis_title="")
             st.plotly_chart(fig, use_container_width=True)
 
@@ -1177,7 +1344,7 @@ elif st.session_state.step == 8:
                                 labels=dict(x="Predicted", y="Actual"),
                                 title="Confusion Matrix")
                 fig.update_layout(**PLOTLY_LAYOUT, height=400,
-                                  title=dict(text="Confusion Matrix",font=dict(color='#1a2332')))
+                                  title=dict(text="Confusion Matrix", font=dict(color='#1a2332')))
                 st.plotly_chart(fig, use_container_width=True)
 
                 with st.expander("📋 Classification Report"):
@@ -1214,7 +1381,7 @@ elif st.session_state.step == 8:
                               x1=float(y_test_enc.max()), y1=float(y_test_enc.max()),
                               line=dict(color="#c0392b", dash="dash"))
                 fig.update_layout(**PLOTLY_LAYOUT, height=400,
-                                  title=dict(text="Actual vs Predicted Healthcare Expenditure",font=dict(color='#1a2332')))
+                                  title=dict(text="Actual vs Predicted Healthcare Expenditure", font=dict(color='#1a2332')))
                 st.plotly_chart(fig, use_container_width=True)
 
                 residuals = y_test_enc - test_preds
@@ -1223,7 +1390,7 @@ elif st.session_state.step == 8:
                                     labels={"x":"Residual"},
                                     title="Residual Distribution")
                 fig2.update_layout(**PLOTLY_LAYOUT, height=320,
-                                   title=dict(text="Residual Distribution",font=dict(color='#1a2332')))
+                                   title=dict(text="Residual Distribution", font=dict(color='#1a2332')))
                 st.plotly_chart(fig2, use_container_width=True)
 
         except Exception as e:
@@ -1361,7 +1528,7 @@ elif st.session_state.step == 9:
                     fig.update_layout(**PLOTLY_LAYOUT, height=400,
                                       xaxis_title="Combination #",
                                       yaxis_title=scoring, showlegend=False,
-                                      title=dict(text=f"Top 15 parameter combinations — {scoring}",font=dict(color='#1a2332')))
+                                      title=dict(text=f"Top 15 parameter combinations — {scoring}", font=dict(color='#1a2332')))
                     st.plotly_chart(fig, use_container_width=True)
 
                     st.session_state.trained_model = searcher.best_estimator_
@@ -1382,10 +1549,10 @@ elif st.session_state.step == 9:
             st.rerun()
 
 
-# ── FOOTER ────────────────────────────────────────────────────────────────────
+# ── Footer ─────────────────────────────────────────────────────────────────────
 st.markdown("""
 <div style="text-align:center;padding:32px 20px 20px;border-top:1px solid var(--border);margin-top:40px;">
-    <div style="display:flex;justify-content:center;align-items:center;gap:24px;margin-bottom:12px;">
+    <div style="display:flex;justify-content:center;align-items:center;gap:24px;margin-bottom:12px;flex-wrap:wrap;">
         <span style="font-size:12px;color:var(--muted);">💊 Clinical Cost Modeling</span>
         <span style="color:var(--border);">|</span>
         <span style="font-size:12px;color:var(--muted);">📊 Expenditure Analytics</span>
