@@ -7,7 +7,6 @@ from plotly.subplots import make_subplots
 import warnings
 warnings.filterwarnings('ignore')
 
-# ── Page Config ──────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="ML Pipeline · Healthcare Finance",
     page_icon="🏥",
@@ -15,146 +14,140 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# ── Global CSS ────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap');
 
 :root {
-    --bg: #0a0e1a;
-    --surface: #111827;
-    --surface2: #1a2235;
-    --border: #1f2d45;
-    --accent: #00d4aa;
-    --accent2: #7c6aff;
-    --accent3: #ff6b6b;
-    --text: #e2e8f0;
-    --muted: #64748b;
-    --card-bg: rgba(17,24,39,0.95);
+    --bg: #f0f4f8;
+    --surface: #ffffff;
+    --surface2: #e8f0f7;
+    --border: #c8d8e8;
+    --accent: #1a6fa8;
+    --accent-light: #d6eaf8;
+    --accent2: #0e8c6a;
+    --accent2-light: #d4f0e8;
+    --accent3: #c0392b;
+    --accent3-light: #fde8e6;
+    --gold: #b8860b;
+    --gold-light: #fdf3d0;
+    --text: #1a2332;
+    --text-body: #2d3e50;
+    --muted: #5f7a94;
+    --card-bg: #ffffff;
+    --header-bg: #0d3b5e;
 }
 
 html, body, [data-testid="stAppViewContainer"] {
     background: var(--bg) !important;
     color: var(--text) !important;
-    font-family: 'DM Sans', sans-serif !important;
+    font-family: 'Inter', sans-serif !important;
 }
 
 [data-testid="stAppViewContainer"]::before {
     content: '';
     position: fixed;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(ellipse at 20% 20%, rgba(0,212,170,0.04) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 80%, rgba(124,106,255,0.04) 0%, transparent 50%);
-    pointer-events: none;
-    z-index: 0;
+    top: 0; left: 0;
+    width: 100%; height: 6px;
+    background: linear-gradient(90deg, #1a6fa8, #0e8c6a, #b8860b);
+    z-index: 999;
 }
 
 [data-testid="stHeader"] { background: transparent !important; }
 
-/* Sidebar */
 [data-testid="stSidebar"] {
-    background: var(--surface) !important;
-    border-right: 1px solid var(--border) !important;
+    background: var(--header-bg) !important;
+    border-right: 1px solid #1a4a6e !important;
 }
 
-/* Buttons */
 .stButton > button {
-    background: linear-gradient(135deg, var(--accent), #00b894) !important;
-    color: #0a0e1a !important;
+    background: var(--accent) !important;
+    color: #ffffff !important;
     border: none !important;
-    border-radius: 8px !important;
-    font-family: 'DM Sans', sans-serif !important;
+    border-radius: 6px !important;
+    font-family: 'Inter', sans-serif !important;
     font-weight: 600 !important;
     font-size: 14px !important;
     padding: 10px 24px !important;
     transition: all 0.2s ease !important;
+    letter-spacing: 0.3px !important;
 }
 .stButton > button:hover {
+    background: #155d8e !important;
     transform: translateY(-1px) !important;
-    box-shadow: 0 8px 24px rgba(0,212,170,0.3) !important;
+    box-shadow: 0 4px 12px rgba(26,111,168,0.25) !important;
 }
 
-/* Selectbox, multiselect */
 .stSelectbox > div > div,
 .stMultiSelect > div > div {
-    background: var(--surface2) !important;
+    background: var(--surface) !important;
     border: 1px solid var(--border) !important;
-    border-radius: 8px !important;
+    border-radius: 6px !important;
     color: var(--text) !important;
 }
 
-/* Number input */
 .stNumberInput > div > div > input {
-    background: var(--surface2) !important;
+    background: var(--surface) !important;
     border: 1px solid var(--border) !important;
     color: var(--text) !important;
-    border-radius: 8px !important;
+    border-radius: 6px !important;
 }
 
-/* Slider */
 .stSlider > div > div > div { background: var(--accent) !important; }
 
-/* File uploader */
 [data-testid="stFileUploader"] {
-    background: var(--surface2) !important;
-    border: 1px dashed var(--border) !important;
-    border-radius: 12px !important;
+    background: var(--accent-light) !important;
+    border: 2px dashed var(--accent) !important;
+    border-radius: 10px !important;
 }
 
-/* Dataframe */
-[data-testid="stDataFrame"] { border-radius: 12px !important; }
+[data-testid="stDataFrame"] { border-radius: 8px !important; }
 
-/* Expander */
 .streamlit-expanderHeader {
     background: var(--surface2) !important;
     border: 1px solid var(--border) !important;
-    border-radius: 8px !important;
+    border-radius: 6px !important;
     color: var(--text) !important;
 }
 
-/* Metric */
 [data-testid="stMetric"] {
-    background: var(--surface2) !important;
+    background: var(--surface) !important;
     border: 1px solid var(--border) !important;
-    border-radius: 12px !important;
+    border-left: 4px solid var(--accent) !important;
+    border-radius: 8px !important;
     padding: 16px !important;
 }
-[data-testid="stMetricValue"] { color: var(--accent) !important; font-size: 28px !important; }
-[data-testid="stMetricLabel"] { color: var(--muted) !important; }
+[data-testid="stMetricValue"] { color: var(--accent) !important; font-size: 26px !important; font-weight: 700 !important; }
+[data-testid="stMetricLabel"] { color: var(--muted) !important; font-size: 12px !important; text-transform: uppercase !important; letter-spacing: 0.5px !important; }
 
-/* Horizontal rule */
 hr { border-color: var(--border) !important; }
 
-/* Radio */
-.stRadio > div { flex-direction: row !important; gap: 16px !important; }
+.stRadio > div { flex-direction: row !important; gap: 12px !important; }
 .stRadio > div > label {
-    background: var(--surface2) !important;
+    background: var(--surface) !important;
     border: 1px solid var(--border) !important;
-    border-radius: 8px !important;
+    border-radius: 6px !important;
     padding: 8px 18px !important;
     cursor: pointer !important;
     transition: all 0.2s !important;
+    color: var(--text-body) !important;
 }
-.stRadio > div > label:hover { border-color: var(--accent) !important; }
+.stRadio > div > label:hover { border-color: var(--accent) !important; background: var(--accent-light) !important; }
 
-/* Success / Warning / Error */
-.stSuccess { background: rgba(0,212,170,0.1) !important; border: 1px solid var(--accent) !important; border-radius: 8px !important; }
-.stWarning { background: rgba(255,193,7,0.1) !important; border-radius: 8px !important; }
-.stError   { background: rgba(255,107,107,0.1) !important; border: 1px solid var(--accent3) !important; border-radius: 8px !important; }
-.stInfo    { background: rgba(124,106,255,0.1) !important; border: 1px solid var(--accent2) !important; border-radius: 8px !important; }
+.stSuccess { background: var(--accent2-light) !important; border: 1px solid var(--accent2) !important; border-radius: 6px !important; color: #0a5c44 !important; }
+.stWarning { background: var(--gold-light) !important; border: 1px solid var(--gold) !important; border-radius: 6px !important; }
+.stError   { background: var(--accent3-light) !important; border: 1px solid var(--accent3) !important; border-radius: 6px !important; }
+.stInfo    { background: var(--accent-light) !important; border: 1px solid var(--accent) !important; border-radius: 6px !important; }
 </style>
 """, unsafe_allow_html=True)
 
 
-# ── Helpers ───────────────────────────────────────────────────────────────────
 def card(content_fn, title="", accent="var(--accent)"):
     st.markdown(f"""
-    <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:14px;
-                padding:24px;margin-bottom:20px;border-top:3px solid {accent};">
-        {'<p style="font-family:Space Mono,monospace;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;">' + title + '</p>' if title else ''}
+    <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:10px;
+                padding:24px;margin-bottom:20px;border-left:4px solid {accent};
+                box-shadow:0 1px 4px rgba(26,111,168,0.08);">
+        {'<p style="font-family:Inter,sans-serif;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px;font-weight:600;">' + title + '</p>' if title else ''}
     """, unsafe_allow_html=True)
     content_fn()
     st.markdown("</div>", unsafe_allow_html=True)
@@ -162,24 +155,24 @@ def card(content_fn, title="", accent="var(--accent)"):
 
 def step_badge(n, label, done=False, active=False):
     if active:
-        bg, col, border = "var(--accent)", "#0a0e1a", "var(--accent)"
+        bg, col, border = "var(--accent)", "#ffffff", "var(--accent)"
     elif done:
-        bg, col, border = "rgba(0,212,170,0.15)", "var(--accent)", "var(--accent)"
+        bg, col, border = "var(--accent2-light)", "var(--accent2)", "var(--accent2)"
     else:
-        bg, col, border = "var(--surface2)", "var(--muted)", "var(--border)"
+        bg, col, border = "var(--surface)", "var(--muted)", "var(--border)"
     return f"""
     <div style="display:flex;flex-direction:column;align-items:center;gap:6px;min-width:90px;">
-        <div style="width:40px;height:40px;border-radius:50%;background:{bg};border:2px solid {border};
+        <div style="width:38px;height:38px;border-radius:50%;background:{bg};border:2px solid {border};
                     display:flex;align-items:center;justify-content:center;
-                    font-family:Space Mono,monospace;font-weight:700;font-size:13px;color:{col};">
+                    font-family:Inter,sans-serif;font-weight:700;font-size:13px;color:{col};">
             {'✓' if done else str(n)}
         </div>
-        <span style="font-size:10px;color:{col};text-align:center;font-weight:500;line-height:1.3;">{label}</span>
+        <span style="font-size:10px;color:{col};text-align:center;font-weight:600;line-height:1.3;letter-spacing:0.2px;">{label}</span>
     </div>"""
 
 
 def connector(done=False):
-    col = "var(--accent)" if done else "var(--border)"
+    col = "var(--accent2)" if done else "var(--border)"
     return f'<div style="flex:1;height:2px;background:{col};margin-top:-14px;"></div>'
 
 
@@ -190,7 +183,7 @@ STEPS = [
 ]
 
 def render_stepper(current_step):
-    html = '<div style="display:flex;align-items:flex-start;gap:0;padding:20px 10px;overflow-x:auto;">'
+    html = '<div style="display:flex;align-items:flex-start;gap:0;padding:16px 10px;overflow-x:auto;">'
     for i, label in enumerate(STEPS):
         done = i < current_step
         active = i == current_step
@@ -199,8 +192,8 @@ def render_stepper(current_step):
             html += connector(done)
     html += '</div>'
     st.markdown(f"""
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;
-                padding:12px 8px;margin-bottom:28px;">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;
+                padding:8px;margin-bottom:28px;box-shadow:0 1px 4px rgba(26,111,168,0.06);">
         {html}
     </div>
     """, unsafe_allow_html=True)
@@ -210,20 +203,20 @@ def section_header(step_n, title, subtitle=""):
     st.markdown(f"""
     <div style="margin-bottom:24px;">
         <div style="display:flex;align-items:center;gap:14px;margin-bottom:6px;">
-            <div style="width:36px;height:36px;border-radius:10px;
-                        background:linear-gradient(135deg,var(--accent),#00b894);
+            <div style="width:36px;height:36px;border-radius:8px;
+                        background:var(--accent);
                         display:flex;align-items:center;justify-content:center;
-                        font-family:Space Mono,monospace;font-weight:700;font-size:13px;color:#0a0e1a;">
+                        font-family:Inter,sans-serif;font-weight:700;font-size:13px;color:#fff;">
                 {step_n:02d}
             </div>
             <h2 style="margin:0;font-size:22px;font-weight:700;color:var(--text);">{title}</h2>
         </div>
         {'<p style="color:var(--muted);margin:0 0 0 50px;font-size:14px;">' + subtitle + '</p>' if subtitle else ''}
+        <div style="height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2),transparent);border-radius:2px;margin-top:12px;margin-left:50px;width:200px;"></div>
     </div>
     """, unsafe_allow_html=True)
 
 
-# ── State Initialization ──────────────────────────────────────────────────────
 defaults = dict(
     step=0, problem_type=None, df=None, target=None, features=None,
     df_clean=None, selected_features=None, X_train=None, X_test=None,
@@ -236,34 +229,63 @@ for k, v in defaults.items():
         st.session_state[k] = v
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-# HEADER
-# ══════════════════════════════════════════════════════════════════════════════
+# ── HEADER ────────────────────────────────────────────────────────────────────
 st.markdown("""
-<div style="text-align:center;padding:40px 20px 20px;">
-    <div style="font-family:Space Mono,monospace;font-size:11px;color:var(--accent);
-                letter-spacing:4px;text-transform:uppercase;margin-bottom:10px;">
-        AutoML · Healthcare Finance
+<div style="background:linear-gradient(135deg,#0d3b5e 0%,#1a6fa8 60%,#0e8c6a 100%);
+            border-radius:14px;padding:40px 40px 36px;margin-bottom:28px;
+            border:1px solid #1a6fa8;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:0;right:0;width:300px;height:100%;
+                background:url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 300 200\"><path d=\"M0 100 Q75 40 150 100 T300 100\" stroke=\"rgba(255,255,255,0.06)\" fill=\"none\" stroke-width=\"2\"/><path d=\"M0 130 Q75 70 150 130 T300 130\" stroke=\"rgba(255,255,255,0.04)\" fill=\"none\" stroke-width=\"2\"/><path d=\"M0 70 Q75 10 150 70 T300 70\" stroke=\"rgba(255,255,255,0.04)\" fill=\"none\" stroke-width=\"2\"/></svg>') no-repeat right center;
+                opacity:0.8;pointer-events:none;"></div>
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:14px;">
+        <div style="width:48px;height:48px;background:rgba(255,255,255,0.15);border-radius:10px;
+                    display:flex;align-items:center;justify-content:center;font-size:24px;">🏥</div>
+        <div>
+            <div style="font-family:Inter,sans-serif;font-size:10px;color:rgba(255,255,255,0.6);
+                        letter-spacing:3px;text-transform:uppercase;margin-bottom:4px;">
+                AutoML Platform · Healthcare Finance Analytics
+            </div>
+            <h1 style="font-size:32px;font-weight:700;margin:0;color:#ffffff;letter-spacing:-0.5px;">
+                ML Pipeline Studio
+            </h1>
+        </div>
     </div>
-    <h1 style="font-size:42px;font-weight:700;margin:0;
-               background:linear-gradient(135deg,#00d4aa,#7c6aff);
-               -webkit-background-clip:text;-webkit-text-fill-color:transparent;">
-        ML Pipeline Studio
-    </h1>
-    <p style="color:var(--muted);font-size:15px;margin-top:10px;">
-        End-to-end machine learning · from raw data to tuned model
+    <p style="color:rgba(255,255,255,0.7);font-size:14px;margin:0;max-width:500px;">
+        End-to-end machine learning for healthcare expenditure analysis — from raw data to tuned predictive model
     </p>
+    <div style="display:flex;gap:24px;margin-top:20px;">
+        <div style="background:rgba(255,255,255,0.1);border-radius:6px;padding:8px 16px;
+                    font-size:12px;color:rgba(255,255,255,0.85);font-weight:500;">
+            💊 Clinical Cost Modeling
+        </div>
+        <div style="background:rgba(255,255,255,0.1);border-radius:6px;padding:8px 16px;
+                    font-size:12px;color:rgba(255,255,255,0.85);font-weight:500;">
+            📊 Expenditure Forecasting
+        </div>
+        <div style="background:rgba(255,255,255,0.1);border-radius:6px;padding:8px 16px;
+                    font-size:12px;color:rgba(255,255,255,0.85);font-weight:500;">
+            🌐 Global Health Metrics
+        </div>
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
 render_stepper(st.session_state.step)
+
+PLOTLY_LAYOUT = dict(
+    paper_bgcolor='rgba(0,0,0,0)',
+    plot_bgcolor='rgba(248,251,254,1)',
+    font_color='#1a2332',
+    font_family='Inter',
+)
+COLORS = ["#1a6fa8", "#0e8c6a", "#b8860b", "#c0392b", "#5b4fcf", "#0891b2"]
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 # STEP 0 — PROBLEM TYPE
 # ══════════════════════════════════════════════════════════════════════════════
 if st.session_state.step == 0:
-    section_header(1, "Problem Type", "What kind of ML task are you solving?")
+    section_header(1, "Problem Type", "Define the machine learning task for your healthcare finance analysis")
 
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
@@ -271,34 +293,39 @@ if st.session_state.step == 0:
                           horizontal=True, label_visibility="collapsed")
         st.markdown("<br>", unsafe_allow_html=True)
 
-        # Visual cards
         c1, c2 = st.columns(2)
         with c1:
-            active_cls = "#00d4aa" if choice == "Classification" else "var(--border)"
+            active_cls = "var(--accent)" if choice == "Classification" else "var(--border)"
+            bg_cls = "var(--accent-light)" if choice == "Classification" else "var(--surface)"
             st.markdown(f"""
-            <div style="background:var(--surface2);border:2px solid {active_cls};border-radius:14px;
-                        padding:20px;text-align:center;transition:all 0.3s;">
-                <div style="font-size:32px;margin-bottom:10px;">🎯</div>
-                <div style="font-weight:700;color:var(--text);font-size:16px;">Classification</div>
-                <div style="color:var(--muted);font-size:13px;margin-top:8px;">
-                    Predict discrete labels or categories
+            <div style="background:{bg_cls};border:2px solid {active_cls};border-radius:10px;
+                        padding:24px;text-align:center;">
+                <div style="width:48px;height:48px;background:var(--accent);border-radius:8px;
+                            display:flex;align-items:center;justify-content:center;
+                            font-size:22px;margin:0 auto 12px;">🎯</div>
+                <div style="font-weight:700;color:var(--text);font-size:16px;margin-bottom:8px;">Classification</div>
+                <div style="color:var(--muted);font-size:13px;line-height:1.5;">
+                    Predict discrete outcomes such as high/low cost risk categories
                 </div>
-                <div style="margin-top:12px;font-size:11px;color:var(--accent);font-family:Space Mono,monospace;">
-                    Logistic · SVM · Random Forest
+                <div style="margin-top:12px;font-size:11px;color:var(--accent);font-family:Inter,sans-serif;font-weight:600;letter-spacing:0.5px;">
+                    LOGISTIC · SVM · RANDOM FOREST
                 </div>
             </div>""", unsafe_allow_html=True)
         with c2:
-            active_reg = "#7c6aff" if choice == "Regression" else "var(--border)"
+            active_reg = "var(--accent2)" if choice == "Regression" else "var(--border)"
+            bg_reg = "var(--accent2-light)" if choice == "Regression" else "var(--surface)"
             st.markdown(f"""
-            <div style="background:var(--surface2);border:2px solid {active_reg};border-radius:14px;
-                        padding:20px;text-align:center;transition:all 0.3s;">
-                <div style="font-size:32px;margin-bottom:10px;">📈</div>
-                <div style="font-weight:700;color:var(--text);font-size:16px;">Regression</div>
-                <div style="color:var(--muted);font-size:13px;margin-top:8px;">
-                    Predict continuous numerical values
+            <div style="background:{bg_reg};border:2px solid {active_reg};border-radius:10px;
+                        padding:24px;text-align:center;">
+                <div style="width:48px;height:48px;background:var(--accent2);border-radius:8px;
+                            display:flex;align-items:center;justify-content:center;
+                            font-size:22px;margin:0 auto 12px;">📈</div>
+                <div style="font-weight:700;color:var(--text);font-size:16px;margin-bottom:8px;">Regression</div>
+                <div style="color:var(--muted);font-size:13px;line-height:1.5;">
+                    Forecast continuous values like per-capita health expenditure
                 </div>
-                <div style="margin-top:12px;font-size:11px;color:var(--accent2);font-family:Space Mono,monospace;">
-                    Linear · SVR · Random Forest
+                <div style="margin-top:12px;font-size:11px;color:var(--accent2);font-family:Inter,sans-serif;font-weight:600;letter-spacing:0.5px;">
+                    LINEAR · SVR · RANDOM FOREST
                 </div>
             </div>""", unsafe_allow_html=True)
 
@@ -313,14 +340,15 @@ if st.session_state.step == 0:
 # STEP 1 — DATA INPUT
 # ══════════════════════════════════════════════════════════════════════════════
 elif st.session_state.step == 1:
-    section_header(2, "Data Input", "Upload your dataset and configure the target variable")
+    section_header(2, "Data Input", "Upload your healthcare finance dataset and configure the prediction target")
 
     col_left, col_right = st.columns([3, 2])
 
     with col_left:
         st.markdown("""
-        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;">
-            <div style="font-family:Space Mono,monospace;font-size:11px;color:var(--accent);letter-spacing:2px;margin-bottom:12px;">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:16px;
+                    border-left:4px solid var(--accent);">
+            <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;font-weight:600;margin-bottom:12px;">
                 UPLOAD DATASET
             </div>
         """, unsafe_allow_html=True)
@@ -328,7 +356,7 @@ elif st.session_state.step == 1:
         uploaded = st.file_uploader(
             "Drop your CSV / Excel file",
             type=["csv", "xlsx", "xls"],
-            help="Financing Healthcare dataset or any tabular CSV"
+            help="Healthcare Financing dataset (OWID) or any tabular CSV"
         )
         st.markdown("</div>", unsafe_allow_html=True)
 
@@ -341,7 +369,6 @@ elif st.session_state.step == 1:
 
                 st.session_state.df = df
 
-                # Dataset stats
                 n_num = df.select_dtypes(include=np.number).shape[1]
                 n_cat = df.select_dtypes(include='object').shape[1]
                 n_miss = df.isnull().sum().sum()
@@ -357,28 +384,22 @@ elif st.session_state.step == 1:
                 with st.expander("📋 Preview data (first 20 rows)"):
                     st.dataframe(df.head(20), use_container_width=True, height=300)
 
-                # Target selection
-                st.markdown("""
-                <div style="font-family:Space Mono,monospace;font-size:11px;color:var(--accent);
-                            letter-spacing:2px;margin:16px 0 8px;">TARGET FEATURE</div>""",
+                st.markdown("""<div style="font-size:11px;color:var(--muted);text-transform:uppercase;
+                               letter-spacing:1.5px;font-weight:600;margin:16px 0 8px;">TARGET VARIABLE</div>""",
                             unsafe_allow_html=True)
                 target = st.selectbox("Select the column to predict", df.columns.tolist())
                 st.session_state.target = target
 
-                # Feature selection
                 other_cols = [c for c in df.columns if c != target]
-                st.markdown("""
-                <div style="font-family:Space Mono,monospace;font-size:11px;color:var(--accent);
-                            letter-spacing:2px;margin:16px 0 8px;">INPUT FEATURES</div>""",
+                st.markdown("""<div style="font-size:11px;color:var(--muted);text-transform:uppercase;
+                               letter-spacing:1.5px;font-weight:600;margin:16px 0 8px;">INPUT FEATURES</div>""",
                             unsafe_allow_html=True)
                 features = st.multiselect("Select features (default = all)", other_cols, default=other_cols)
                 st.session_state.features = features
 
-                # PCA 2D/3D scatter
                 if len(features) >= 2:
-                    st.markdown("""
-                    <div style="font-family:Space Mono,monospace;font-size:11px;color:var(--accent2);
-                                letter-spacing:2px;margin:20px 0 8px;">PCA DATA SHAPE</div>""",
+                    st.markdown("""<div style="font-size:11px;color:var(--muted);text-transform:uppercase;
+                                   letter-spacing:1.5px;font-weight:600;margin:20px 0 8px;">PCA DATA SHAPE</div>""",
                                 unsafe_allow_html=True)
                     pca_dims = st.radio("PCA dimensions", [2, 3], horizontal=True)
 
@@ -398,27 +419,24 @@ elif st.session_state.step == 1:
                         if n_comp == 2:
                             fig = px.scatter(x=comp[:,0], y=comp[:,1], color=y_col,
                                              labels={"x":"PC1","y":"PC2"},
-                                             template="plotly_dark",
-                                             color_discrete_sequence=px.colors.qualitative.Bold)
+                                             template="plotly_white",
+                                             color_discrete_sequence=COLORS)
                         else:
                             fig = px.scatter_3d(x=comp[:,0], y=comp[:,1], z=comp[:,2],
                                                 color=y_col,
                                                 labels={"x":"PC1","y":"PC2","z":"PC3"},
-                                                template="plotly_dark",
-                                                color_discrete_sequence=px.colors.qualitative.Bold)
+                                                template="plotly_white",
+                                                color_discrete_sequence=COLORS)
                             fig.update_traces(marker_size=3)
 
                         ev = pca.explained_variance_ratio_
                         title_ev = " | ".join([f"PC{i+1}: {v*100:.1f}%" for i, v in enumerate(ev)])
                         fig.update_layout(
                             height=400, margin=dict(l=0,r=0,t=40,b=0),
-                            paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-                            title=dict(text=f"PCA — {title_ev}", font=dict(color='#00d4aa', size=13)),
-                            legend=dict(bgcolor='rgba(0,0,0,0)')
+                            **PLOTLY_LAYOUT,
+                            title=dict(text=f"PCA — {title_ev}", font=dict(color='#1a6fa8', size=13)),
                         )
                         st.plotly_chart(fig, use_container_width=True)
-                    else:
-                        st.info("Need ≥2 numeric features for PCA")
 
                 if st.button("Continue to EDA →", use_container_width=True):
                     st.session_state.df_clean = df[features + [target]].copy()
@@ -430,16 +448,24 @@ elif st.session_state.step == 1:
 
     with col_right:
         st.markdown("""
-        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:20px;">
-            <div style="font-family:Space Mono,monospace;font-size:11px;color:var(--accent2);
-                        letter-spacing:2px;margin-bottom:16px;">DATASET GUIDE</div>
-            <div style="font-size:13px;color:var(--muted);line-height:1.8;">
-                <p>📂 <b style="color:var(--text);">Financing Healthcare</b><br>
-                   OWID dataset by Ortiz-Ospina & Roser.</p>
-                <p>🎯 <b style="color:var(--text);">Recommended targets</b><br>
-                   che_gdp, che_pc_usd, gghed_che</p>
-                <p>💡 <b style="color:var(--text);">Tip</b><br>
-                   Drop identifier columns like 'country' before modeling.</p>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;
+                    border-left:4px solid var(--gold);">
+            <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;font-weight:600;margin-bottom:16px;">
+                DATASET GUIDE
+            </div>
+            <div style="font-size:13px;color:var(--text-body);line-height:1.8;">
+                <div style="background:var(--accent-light);border-radius:6px;padding:12px;margin-bottom:12px;">
+                    <b style="color:var(--accent);">📂 Financing Healthcare</b><br>
+                    <span style="color:var(--muted);font-size:12px;">OWID dataset by Ortiz-Ospina & Roser — global health expenditure indicators</span>
+                </div>
+                <div style="background:var(--gold-light);border-radius:6px;padding:12px;margin-bottom:12px;">
+                    <b style="color:var(--gold);">🎯 Recommended targets</b><br>
+                    <span style="color:var(--muted);font-size:12px;">che_gdp · che_pc_usd · gghed_che</span>
+                </div>
+                <div style="background:var(--accent2-light);border-radius:6px;padding:12px;">
+                    <b style="color:var(--accent2);">💡 Tip</b><br>
+                    <span style="color:var(--muted);font-size:12px;">Drop identifier columns like 'country' before modeling to avoid data leakage.</span>
+                </div>
                 <hr style="border-color:var(--border);margin:16px 0;">
                 <div style="font-size:12px;color:var(--muted);">
                     Supported formats: CSV · XLSX · XLS
@@ -448,9 +474,7 @@ elif st.session_state.step == 1:
         </div>
         """, unsafe_allow_html=True)
 
-        if st.session_state.df is None:
-            st.markdown("<br>", unsafe_allow_html=True)
-            # back button
+        st.markdown("<br>", unsafe_allow_html=True)
         if st.button("← Back", key="back1"):
             st.session_state.step = 0
             st.rerun()
@@ -460,7 +484,7 @@ elif st.session_state.step == 1:
 # STEP 2 — EDA
 # ══════════════════════════════════════════════════════════════════════════════
 elif st.session_state.step == 2:
-    section_header(3, "Exploratory Data Analysis", "Understand distributions, correlations and missing patterns")
+    section_header(3, "Exploratory Data Analysis", "Understand distributions, correlations and missing patterns in your healthcare data")
 
     df = st.session_state.df_clean
     target = st.session_state.target
@@ -471,7 +495,6 @@ elif st.session_state.step == 2:
         numeric_cols = df.select_dtypes(include=np.number).columns.tolist()
         cat_cols = df.select_dtypes(include='object').columns.tolist()
 
-        # Summary stats
         with st.expander("📊 Descriptive Statistics", expanded=True):
             st.dataframe(df.describe().T, use_container_width=True)
 
@@ -482,16 +505,13 @@ elif st.session_state.step == 2:
             if cols_to_plot:
                 n_cols = 3
                 n_rows = -(-len(cols_to_plot) // n_cols)
-                fig = make_subplots(rows=n_rows, cols=n_cols,
-                                    subplot_titles=cols_to_plot)
+                fig = make_subplots(rows=n_rows, cols=n_cols, subplot_titles=cols_to_plot)
                 for idx, col in enumerate(cols_to_plot):
                     r, c = divmod(idx, n_cols)
                     fig.add_trace(go.Histogram(x=df[col].dropna(), name=col,
-                                               marker_color=f'#{["00d4aa","7c6aff","ff6b6b","ffd166","06d6a0","ef476f"][idx%6]}',
+                                               marker_color=COLORS[idx % len(COLORS)],
                                                showlegend=False), row=r+1, col=c+1)
-                fig.update_layout(height=300*n_rows, paper_bgcolor='rgba(0,0,0,0)',
-                                  plot_bgcolor='rgba(0,0,0,0)', font_color='#e2e8f0',
-                                  showlegend=False)
+                fig.update_layout(height=300*n_rows, **PLOTLY_LAYOUT, showlegend=False)
                 st.plotly_chart(fig, use_container_width=True)
 
         with tab2:
@@ -499,21 +519,19 @@ elif st.session_state.step == 2:
                 corr = df[numeric_cols].corr()
                 fig = px.imshow(corr, text_auto=".2f", aspect="auto",
                                 color_continuous_scale="RdBu_r", zmin=-1, zmax=1,
-                                template="plotly_dark")
-                fig.update_layout(height=600, paper_bgcolor='rgba(0,0,0,0)',
-                                  font_color='#e2e8f0')
+                                template="plotly_white")
+                fig.update_layout(height=600, **PLOTLY_LAYOUT)
                 st.plotly_chart(fig, use_container_width=True)
 
-                # Top correlations with target
                 if target in numeric_cols:
                     top_corr = corr[target].drop(target).abs().sort_values(ascending=False).head(10)
                     fig2 = px.bar(x=top_corr.values, y=top_corr.index, orientation='h',
                                   color=top_corr.values,
-                                  color_continuous_scale=['#ff6b6b','#ffd166','#00d4aa'],
-                                  template="plotly_dark",
+                                  color_continuous_scale=['#c0392b','#b8860b','#1a6fa8'],
+                                  template="plotly_white",
                                   labels={"x":"Absolute Correlation","y":""})
-                    fig2.update_layout(height=350, paper_bgcolor='rgba(0,0,0,0)',
-                                       font_color='#e2e8f0', title="Top correlations with target")
+                    fig2.update_layout(height=350, **PLOTLY_LAYOUT,
+                                       title=dict(text="Top correlations with target",font=dict(color='#1a2332')))
                     st.plotly_chart(fig2, use_container_width=True)
 
         with tab3:
@@ -523,10 +541,10 @@ elif st.session_state.step == 2:
                 st.success("✅ No missing values detected!")
             else:
                 fig = px.bar(x=miss.index, y=miss.values,
-                             color=miss.values, color_continuous_scale="Reds",
-                             template="plotly_dark",
+                             color=miss.values, color_continuous_scale=["#fde8e6","#c0392b"],
+                             template="plotly_white",
                              labels={"x":"Column","y":"Missing Count"})
-                fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', font_color='#e2e8f0')
+                fig.update_layout(**PLOTLY_LAYOUT)
                 st.plotly_chart(fig, use_container_width=True)
                 st.markdown(f"**{len(miss)} columns** have missing values · **{df.isnull().sum().sum():,}** total NaN cells")
 
@@ -534,22 +552,22 @@ elif st.session_state.step == 2:
             if target in numeric_cols:
                 c1, c2 = st.columns(2)
                 with c1:
-                    fig = px.histogram(df, x=target, template="plotly_dark",
-                                       color_discrete_sequence=["#00d4aa"])
-                    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', font_color='#e2e8f0',
-                                      title=f"Distribution of {target}")
+                    fig = px.histogram(df, x=target, template="plotly_white",
+                                       color_discrete_sequence=["#1a6fa8"])
+                    fig.update_layout(**PLOTLY_LAYOUT,
+                                      title=dict(text=f"Distribution of {target}",font=dict(color='#1a2332')))
                     st.plotly_chart(fig, use_container_width=True)
                 with c2:
-                    fig = px.box(df, y=target, template="plotly_dark",
-                                 color_discrete_sequence=["#7c6aff"])
-                    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', font_color='#e2e8f0',
-                                      title=f"Box Plot — {target}")
+                    fig = px.box(df, y=target, template="plotly_white",
+                                 color_discrete_sequence=["#0e8c6a"])
+                    fig.update_layout(**PLOTLY_LAYOUT,
+                                      title=dict(text=f"Box Plot — {target}",font=dict(color='#1a2332')))
                     st.plotly_chart(fig, use_container_width=True)
             else:
-                fig = px.bar(df[target].value_counts(), template="plotly_dark",
-                             color_discrete_sequence=["#00d4aa"])
-                fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', font_color='#e2e8f0',
-                                  title=f"Class Distribution — {target}")
+                fig = px.bar(df[target].value_counts(), template="plotly_white",
+                             color_discrete_sequence=["#1a6fa8"])
+                fig.update_layout(**PLOTLY_LAYOUT,
+                                  title=dict(text=f"Class Distribution — {target}",font=dict(color='#1a2332')))
                 st.plotly_chart(fig, use_container_width=True)
 
         col1, col2 = st.columns(2)
@@ -574,9 +592,8 @@ elif st.session_state.step == 3:
     col_l, col_r = st.columns([3, 2])
 
     with col_l:
-        # ── Missing Value Imputation ──
-        st.markdown("""<div style="font-family:Space Mono,monospace;font-size:11px;color:var(--accent);
-                       letter-spacing:2px;margin-bottom:8px;">MISSING VALUE STRATEGY</div>""",
+        st.markdown("""<div style="font-size:11px;color:var(--muted);text-transform:uppercase;
+                       letter-spacing:1.5px;font-weight:600;margin-bottom:8px;">MISSING VALUE STRATEGY</div>""",
                     unsafe_allow_html=True)
 
         impute_method = st.selectbox("Imputation method",
@@ -600,9 +617,8 @@ elif st.session_state.step == 3:
 
         st.markdown("<hr>", unsafe_allow_html=True)
 
-        # ── Outlier Detection ──
-        st.markdown("""<div style="font-family:Space Mono,monospace;font-size:11px;color:var(--accent);
-                       letter-spacing:2px;margin-bottom:8px;">OUTLIER DETECTION</div>""",
+        st.markdown("""<div style="font-size:11px;color:var(--muted);text-transform:uppercase;
+                       letter-spacing:1.5px;font-weight:600;margin-bottom:8px;">OUTLIER DETECTION</div>""",
                     unsafe_allow_html=True)
 
         outlier_method = st.selectbox("Detection method",
@@ -652,17 +668,16 @@ elif st.session_state.step == 3:
             if outlier_idx:
                 st.warning(f"⚠️ Detected **{len(outlier_idx):,}** outliers ({pct:.1f}% of data)")
 
-                # Viz
                 if len(feat_for_outlier) >= 2:
                     is_out = pd.Series(df.index.isin(outlier_idx), index=df.index)
                     color_labels = is_out.map({True:"Outlier", False:"Normal"})
                     fig = px.scatter(df, x=feat_for_outlier[0], y=feat_for_outlier[1],
                                      color=color_labels,
-                                     color_discrete_map={"Outlier":"#ff6b6b","Normal":"#00d4aa"},
-                                     template="plotly_dark",
+                                     color_discrete_map={"Outlier":"#c0392b","Normal":"#1a6fa8"},
+                                     template="plotly_white",
                                      title=f"Outliers via {outlier_method}")
-                    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', font_color='#e2e8f0',
-                                      height=380)
+                    fig.update_layout(**PLOTLY_LAYOUT, height=380,
+                                      title=dict(text=f"Outliers via {outlier_method}",font=dict(color='#1a2332')))
                     st.plotly_chart(fig, use_container_width=True)
 
                 with st.expander("👀 Preview outlier rows"):
@@ -679,9 +694,11 @@ elif st.session_state.step == 3:
 
     with col_r:
         st.markdown("""
-        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:20px;">
-            <div style="font-family:Space Mono,monospace;font-size:11px;color:var(--accent2);
-                        letter-spacing:2px;margin-bottom:14px;">CURRENT DATA STATE</div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;
+                    border-left:4px solid var(--accent2);">
+            <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;font-weight:600;margin-bottom:14px;">
+                CURRENT DATA STATE
+            </div>
         """, unsafe_allow_html=True)
 
         df_now = st.session_state.df_clean
@@ -706,7 +723,7 @@ elif st.session_state.step == 3:
 # STEP 4 — FEATURE SELECTION
 # ══════════════════════════════════════════════════════════════════════════════
 elif st.session_state.step == 4:
-    section_header(5, "Feature Selection", "Select the most informative features for your model")
+    section_header(5, "Feature Selection", "Identify the most informative healthcare finance predictors")
 
     df = st.session_state.df_clean.copy().dropna()
     target = st.session_state.target
@@ -733,13 +750,12 @@ elif st.session_state.step == 4:
 
                     variances = df[numeric_cols].var().sort_values(ascending=False)
                     fig = px.bar(x=variances.index, y=variances.values,
-                                 color=(variances >= thresh).map({True:"#00d4aa", False:"#ff6b6b"}),
-                                 template="plotly_dark",
+                                 color=(variances >= thresh).map({True:"#1a6fa8", False:"#c0392b"}),
+                                 template="plotly_white",
                                  labels={"x":"Feature","y":"Variance"})
-                    fig.add_hline(y=thresh, line_dash="dash", line_color="#ffd166",
+                    fig.add_hline(y=thresh, line_dash="dash", line_color="#b8860b",
                                   annotation_text=f"Threshold={thresh}")
-                    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', font_color='#e2e8f0',
-                                      showlegend=False, height=380)
+                    fig.update_layout(**PLOTLY_LAYOUT, showlegend=False, height=380)
                     st.plotly_chart(fig, use_container_width=True)
                     st.info(f"Keeping **{len(selected)}** features · Removing **{len(removed)}**")
                 except Exception as e:
@@ -753,12 +769,11 @@ elif st.session_state.step == 4:
 
                 fig = px.bar(x=corrs.sort_values(ascending=False).index,
                              y=corrs.sort_values(ascending=False).values,
-                             color=(corrs.sort_values(ascending=False) >= corr_thresh).map({True:"#00d4aa",False:"#ff6b6b"}),
-                             template="plotly_dark",
+                             color=(corrs.sort_values(ascending=False) >= corr_thresh).map({True:"#1a6fa8",False:"#c0392b"}),
+                             template="plotly_white",
                              labels={"x":"Feature","y":f"|Corr with {target}|"})
-                fig.add_hline(y=corr_thresh, line_dash="dash", line_color="#ffd166")
-                fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', font_color='#e2e8f0',
-                                  showlegend=False, height=380)
+                fig.add_hline(y=corr_thresh, line_dash="dash", line_color="#b8860b")
+                fig.update_layout(**PLOTLY_LAYOUT, showlegend=False, height=380)
                 st.plotly_chart(fig, use_container_width=True)
                 st.info(f"Keeping **{len(selected)}** features above threshold")
 
@@ -781,25 +796,26 @@ elif st.session_state.step == 4:
             selected = mi_series.head(top_k).index.tolist()
 
             fig = px.bar(x=mi_series.index, y=mi_series.values,
-                         color=(mi_series.index.isin(selected)).map({True:"#00d4aa",False:"#7c6aff"}),
-                         template="plotly_dark",
+                         color=(mi_series.index.isin(selected)).map({True:"#1a6fa8",False:"#0e8c6a"}),
+                         template="plotly_white",
                          labels={"x":"Feature","y":"Mutual Information Score"})
-            fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', font_color='#e2e8f0',
-                              showlegend=False, height=380)
+            fig.update_layout(**PLOTLY_LAYOUT, showlegend=False, height=380)
             st.plotly_chart(fig, use_container_width=True)
             st.info(f"Top **{top_k}** features selected")
 
     with col_r:
         st.markdown("""
-        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:20px;">
-            <div style="font-family:Space Mono,monospace;font-size:11px;color:var(--accent);
-                        letter-spacing:2px;margin-bottom:14px;">SELECTED FEATURES</div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;
+                    border-left:4px solid var(--accent);">
+            <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;font-weight:600;margin-bottom:14px;">
+                SELECTED FEATURES
+            </div>
         """, unsafe_allow_html=True)
         for feat in selected:
             st.markdown(f"""
-            <div style="background:rgba(0,212,170,0.08);border:1px solid rgba(0,212,170,0.2);
-                        border-radius:6px;padding:6px 10px;margin-bottom:6px;
-                        font-size:13px;color:var(--text);">
+            <div style="background:var(--accent-light);border:1px solid var(--border);
+                        border-radius:6px;padding:7px 12px;margin-bottom:6px;
+                        font-size:13px;color:var(--accent);font-weight:500;">
                 ✓ {feat}
             </div>""", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
@@ -820,7 +836,7 @@ elif st.session_state.step == 4:
 # STEP 5 — DATA SPLIT
 # ══════════════════════════════════════════════════════════════════════════════
 elif st.session_state.step == 5:
-    section_header(6, "Data Split", "Partition data into training and testing sets")
+    section_header(6, "Data Split", "Partition your healthcare dataset into training and testing sets")
 
     df = st.session_state.df_clean.dropna()
     target = st.session_state.target
@@ -861,17 +877,16 @@ elif st.session_state.step == 5:
             fig = go.Figure(data=[go.Pie(
                 labels=["Train", "Test"],
                 values=[n_train, n_test],
-                marker=dict(colors=["#00d4aa","#7c6aff"]),
+                marker=dict(colors=["#1a6fa8","#0e8c6a"]),
                 hole=0.55,
                 textinfo="label+percent",
                 textfont_size=14
             )])
-            fig.update_layout(height=320, paper_bgcolor='rgba(0,0,0,0)',
-                              font_color='#e2e8f0', showlegend=False,
+            fig.update_layout(height=320, **PLOTLY_LAYOUT, showlegend=False,
                               margin=dict(l=0,r=0,t=0,b=0),
                               annotations=[dict(text=f"{n_train+n_test:,}<br>total",
                                                x=0.5, y=0.5, showarrow=False,
-                                               font=dict(size=16, color="#e2e8f0"))])
+                                               font=dict(size=16, color="#1a2332"))])
             st.plotly_chart(fig, use_container_width=True)
 
             c1, c2 = st.columns(2)
@@ -893,49 +908,49 @@ elif st.session_state.step == 5:
 # STEP 6 — MODEL SELECTION
 # ══════════════════════════════════════════════════════════════════════════════
 elif st.session_state.step == 6:
-    section_header(7, "Model Selection", "Choose the algorithm that best fits your problem")
+    section_header(7, "Model Selection", "Choose the algorithm best suited for your healthcare finance prediction task")
 
     pt = st.session_state.problem_type
 
     if pt == "Classification":
         model_options = {
-            "Logistic Regression": "🔵",
-            "SVM (kernel options)": "🔷",
-            "Random Forest": "🌲",
-            "K-Means (unsupervised)": "⭕"
+            "Logistic Regression": ("🔵", "Best for binary risk classification (e.g. high/low cost)"),
+            "SVM (kernel options)": ("🔷", "Effective on high-dimensional healthcare feature spaces"),
+            "Random Forest": ("🌲", "Robust ensemble method for complex expenditure patterns"),
+            "K-Means (unsupervised)": ("⭕", "Cluster countries/regions by healthcare spending profile"),
         }
     else:
         model_options = {
-            "Linear Regression": "📏",
-            "SVR (kernel options)": "🔷",
-            "Random Forest Regressor": "🌲",
-            "K-Means (unsupervised)": "⭕"
+            "Linear Regression": ("📏", "Baseline forecasting of healthcare expenditure per capita"),
+            "SVR (kernel options)": ("🔷", "Non-linear health cost prediction with kernel trick"),
+            "Random Forest Regressor": ("🌲", "Capture complex GDP-to-health-spend relationships"),
+            "K-Means (unsupervised)": ("⭕", "Segment health systems by spending patterns"),
         }
 
     cols = st.columns(len(model_options))
     selected_model = st.session_state.model_name or list(model_options.keys())[0]
 
-    for i, (name, icon) in enumerate(model_options.items()):
+    for i, (name, (icon, desc)) in enumerate(model_options.items()):
         with cols[i]:
             active = selected_model == name
             border = "var(--accent)" if active else "var(--border)"
-            bg = "rgba(0,212,170,0.08)" if active else "var(--surface2)"
-            if st.button(f"{icon}\n{name}", key=f"model_{i}", use_container_width=True):
+            bg = "var(--accent-light)" if active else "var(--surface)"
+            if st.button(f"{icon} {name}", key=f"model_{i}", use_container_width=True):
                 st.session_state.model_name = name
                 st.rerun()
             st.markdown(f"""
-            <div style="background:{bg};border:2px solid {border};border-radius:10px;
-                        padding:10px;text-align:center;margin-top:-10px;font-size:12px;color:var(--muted);">
-                {'✓ Selected' if active else 'Click to select'}
+            <div style="background:{bg};border:2px solid {border};border-radius:8px;
+                        padding:10px;text-align:center;margin-top:-8px;font-size:12px;color:var(--muted);
+                        line-height:1.5;">
+                {'<span style="color:var(--accent);font-weight:600;">✓ Selected</span>' if active else desc}
             </div>""", unsafe_allow_html=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # Extra options for SVM
     model_name = st.session_state.model_name
-    if model_name and "SVM" in model_name or (model_name and "SVR" in model_name):
-        st.markdown("""<div style="font-family:Space Mono,monospace;font-size:11px;color:var(--accent);
-                       letter-spacing:2px;margin-bottom:8px;">SVM KERNEL OPTIONS</div>""",
+    if model_name and ("SVM" in model_name or "SVR" in model_name):
+        st.markdown("""<div style="font-size:11px;color:var(--muted);text-transform:uppercase;
+                       letter-spacing:1.5px;font-weight:600;margin-bottom:8px;">SVM KERNEL OPTIONS</div>""",
                     unsafe_allow_html=True)
         kernel = st.selectbox("Kernel", ["rbf", "linear", "poly", "sigmoid"])
         st.session_state["svm_kernel"] = kernel
@@ -954,7 +969,7 @@ elif st.session_state.step == 6:
 # STEP 7 — TRAINING & K-FOLD VALIDATION
 # ══════════════════════════════════════════════════════════════════════════════
 elif st.session_state.step == 7:
-    section_header(8, "Training & K-Fold Validation", "Train your model with cross-validation")
+    section_header(8, "Training & K-Fold Validation", "Train and validate your healthcare finance model with cross-validation")
 
     model_name = st.session_state.model_name
     pt = st.session_state.problem_type
@@ -977,7 +992,6 @@ elif st.session_state.step == 7:
                 Xs = StandardScaler().fit_transform(X_train.fillna(0))
                 ys = y_train.fillna(0)
 
-                # Encode target if classification
                 le = None
                 if pt == "Classification":
                     if not pd.api.types.is_numeric_dtype(ys):
@@ -990,7 +1004,6 @@ elif st.session_state.step == 7:
                             le = LabelEncoder()
                             ys = le.fit_transform(ys.astype(str))
 
-                # Build model
                 kernel = st.session_state.get("svm_kernel", "rbf")
                 try:
                     if pt == "Classification":
@@ -1006,7 +1019,7 @@ elif st.session_state.step == 7:
                             from sklearn.ensemble import RandomForestClassifier
                             model = RandomForestClassifier(n_estimators=100, random_state=42)
                             scoring = "accuracy"
-                        else:  # KMeans
+                        else:
                             from sklearn.cluster import KMeans
                             model = KMeans(n_clusters=k, random_state=42)
                             model.fit(Xs)
@@ -1019,7 +1032,7 @@ elif st.session_state.step == 7:
                         scores = cross_val_score(model, Xs, ys, cv=cv, scoring=scoring)
                         model.fit(Xs, ys)
 
-                    else:  # Regression
+                    else:
                         if "Linear" in model_name:
                             from sklearn.linear_model import LinearRegression
                             model = LinearRegression()
@@ -1055,17 +1068,18 @@ elif st.session_state.step == 7:
         cv_scores = st.session_state.cv_scores
         if cv_scores is not None:
             folds = [f"Fold {i+1}" for i in range(len(cv_scores))]
+            mean_score = np.mean(cv_scores)
 
             fig = go.Figure()
             fig.add_trace(go.Bar(x=folds, y=cv_scores,
-                                 marker_color=["#00d4aa" if s >= np.mean(cv_scores) else "#7c6aff" for s in cv_scores],
+                                 marker_color=["#1a6fa8" if s >= mean_score else "#0e8c6a" for s in cv_scores],
                                  text=[f"{s:.4f}" for s in cv_scores],
                                  textposition="outside"))
-            fig.add_hline(y=np.mean(cv_scores), line_dash="dash", line_color="#ffd166",
-                          annotation_text=f"Mean = {np.mean(cv_scores):.4f}")
-            fig.update_layout(template="plotly_dark", height=380,
-                              paper_bgcolor='rgba(0,0,0,0)', font_color='#e2e8f0',
-                              title="Cross-Validation Scores per Fold",
+            fig.add_hline(y=mean_score, line_dash="dash", line_color="#b8860b",
+                          annotation_text=f"Mean = {mean_score:.4f}")
+            fig.update_layout(template="plotly_white", height=380,
+                              **PLOTLY_LAYOUT,
+                              title=dict(text="Cross-Validation Scores per Fold",font=dict(color='#1a2332')),
                               yaxis_title="Score", xaxis_title="")
             st.plotly_chart(fig, use_container_width=True)
 
@@ -1089,7 +1103,7 @@ elif st.session_state.step == 7:
 # STEP 8 — PERFORMANCE METRICS
 # ══════════════════════════════════════════════════════════════════════════════
 elif st.session_state.step == 8:
-    section_header(9, "Performance Metrics", "Evaluate model quality and detect overfitting / underfitting")
+    section_header(9, "Performance Metrics", "Evaluate model quality and assess fit for healthcare finance predictions")
 
     model = st.session_state.trained_model
     X_train = st.session_state.X_train
@@ -1139,8 +1153,7 @@ elif st.session_state.step == 8:
                 st.stop()
 
             if pt == "Classification":
-                from sklearn.metrics import (accuracy_score, classification_report,
-                                             confusion_matrix, roc_auc_score)
+                from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
                 train_acc = accuracy_score(y_train_enc, train_preds)
                 test_acc  = accuracy_score(y_test_enc,  test_preds)
                 diff = train_acc - test_acc
@@ -1158,20 +1171,20 @@ elif st.session_state.step == 8:
                 else:
                     st.success("🟢 Model appears well-fitted.")
 
-                # Confusion Matrix
                 cm = confusion_matrix(y_test_enc, test_preds)
-                fig = px.imshow(cm, text_auto=True, template="plotly_dark",
-                                color_continuous_scale="Teal",
+                fig = px.imshow(cm, text_auto=True, template="plotly_white",
+                                color_continuous_scale=["#e8f0f7","#1a6fa8"],
                                 labels=dict(x="Predicted", y="Actual"),
                                 title="Confusion Matrix")
-                fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', font_color='#e2e8f0', height=400)
+                fig.update_layout(**PLOTLY_LAYOUT, height=400,
+                                  title=dict(text="Confusion Matrix",font=dict(color='#1a2332')))
                 st.plotly_chart(fig, use_container_width=True)
 
                 with st.expander("📋 Classification Report"):
                     report = classification_report(y_test_enc, test_preds, output_dict=True)
                     st.dataframe(pd.DataFrame(report).T, use_container_width=True)
 
-            else:  # Regression
+            else:
                 from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
                 train_r2  = r2_score(y_train_enc, train_preds)
                 test_r2   = r2_score(y_test_enc,  test_preds)
@@ -1192,25 +1205,25 @@ elif st.session_state.step == 8:
                 else:
                     st.success("🟢 Model appears well-fitted.")
 
-                # Actual vs Predicted
                 fig = px.scatter(x=y_test_enc, y=test_preds,
                                  labels={"x":"Actual","y":"Predicted"},
-                                 template="plotly_dark",
-                                 color_discrete_sequence=["#00d4aa"],
+                                 template="plotly_white",
+                                 color_discrete_sequence=["#1a6fa8"],
                                  title="Actual vs Predicted")
                 fig.add_shape(type="line", x0=float(y_test_enc.min()), y0=float(y_test_enc.min()),
                               x1=float(y_test_enc.max()), y1=float(y_test_enc.max()),
-                              line=dict(color="#ff6b6b", dash="dash"))
-                fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', font_color='#e2e8f0', height=400)
+                              line=dict(color="#c0392b", dash="dash"))
+                fig.update_layout(**PLOTLY_LAYOUT, height=400,
+                                  title=dict(text="Actual vs Predicted Healthcare Expenditure",font=dict(color='#1a2332')))
                 st.plotly_chart(fig, use_container_width=True)
 
-                # Residuals
                 residuals = y_test_enc - test_preds
-                fig2 = px.histogram(x=residuals, template="plotly_dark",
-                                    color_discrete_sequence=["#7c6aff"],
+                fig2 = px.histogram(x=residuals, template="plotly_white",
+                                    color_discrete_sequence=["#0e8c6a"],
                                     labels={"x":"Residual"},
                                     title="Residual Distribution")
-                fig2.update_layout(paper_bgcolor='rgba(0,0,0,0)', font_color='#e2e8f0', height=320)
+                fig2.update_layout(**PLOTLY_LAYOUT, height=320,
+                                   title=dict(text="Residual Distribution",font=dict(color='#1a2332')))
                 st.plotly_chart(fig2, use_container_width=True)
 
         except Exception as e:
@@ -1230,7 +1243,7 @@ elif st.session_state.step == 8:
 # STEP 9 — HYPERPARAMETER TUNING
 # ══════════════════════════════════════════════════════════════════════════════
 elif st.session_state.step == 9:
-    section_header(10, "Hyperparameter Tuning", "Optimize your model with GridSearch or RandomizedSearch")
+    section_header(10, "Hyperparameter Tuning", "Optimize your model for maximum predictive accuracy on healthcare finance data")
 
     model_name = st.session_state.model_name
     pt = st.session_state.problem_type
@@ -1241,7 +1254,7 @@ elif st.session_state.step == 9:
     if X_train is None:
         st.warning("Please complete training first.")
     else:
-        from sklearn.preprocessing import StandardScaler
+        from sklearn.preprocessing import StandardScaler, LabelEncoder
         sc = StandardScaler()
         X_train_s = sc.fit_transform(X_train.fillna(0))
         y_train_raw = y_train.fillna(0)
@@ -1263,38 +1276,21 @@ elif st.session_state.step == 9:
         search_method = st.radio("Search method", ["GridSearchCV", "RandomizedSearchCV"], horizontal=True)
         cv_k = st.number_input("CV folds for tuning", 2, 10, 3)
 
-        # ── Model-specific param grids ──
         param_grids = {}
-
         if "Logistic" in (model_name or "") or "Linear Regression" in (model_name or ""):
             if "Logistic" in (model_name or ""):
-                param_grids = {
-                    "C": [0.001, 0.01, 0.1, 1, 10, 100],
-                    "solver": ["lbfgs", "liblinear"],
-                    "max_iter": [100, 300, 500]
-                }
+                param_grids = {"C": [0.001, 0.01, 0.1, 1, 10, 100], "solver": ["lbfgs", "liblinear"], "max_iter": [100, 300, 500]}
             else:
                 param_grids = {"fit_intercept": [True, False], "copy_X": [True]}
-
         elif "SVM" in (model_name or "") or "SVR" in (model_name or ""):
-            param_grids = {
-                "C": [0.01, 0.1, 1, 10],
-                "kernel": ["rbf", "linear", "poly"],
-                "gamma": ["scale", "auto"]
-            }
-
+            param_grids = {"C": [0.01, 0.1, 1, 10], "kernel": ["rbf", "linear", "poly"], "gamma": ["scale", "auto"]}
         elif "Random Forest" in (model_name or ""):
-            param_grids = {
-                "n_estimators": [50, 100, 200],
-                "max_depth": [None, 5, 10, 20],
-                "min_samples_split": [2, 5, 10]
-            }
+            param_grids = {"n_estimators": [50, 100, 200], "max_depth": [None, 5, 10, 20], "min_samples_split": [2, 5, 10]}
         elif "K-Means" in (model_name or ""):
             param_grids = {"n_clusters": [2, 3, 4, 5, 6, 7, 8]}
 
-        # Display param grid UI
-        st.markdown("""<div style="font-family:Space Mono,monospace;font-size:11px;color:var(--accent);
-                       letter-spacing:2px;margin:16px 0 8px;">PARAMETER GRID</div>""",
+        st.markdown("""<div style="font-size:11px;color:var(--muted);text-transform:uppercase;
+                       letter-spacing:1.5px;font-weight:600;margin:16px 0 8px;">PARAMETER GRID</div>""",
                     unsafe_allow_html=True)
         st.json(param_grids)
 
@@ -1308,77 +1304,66 @@ elif st.session_state.step == 9:
             else:
                 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 
-                # Rebuild base model
                 try:
                     if "Logistic" in model_name:
                         from sklearn.linear_model import LogisticRegression
-                        base = LogisticRegression(random_state=42)
-                        scoring = "accuracy"
+                        base = LogisticRegression(random_state=42); scoring = "accuracy"
                     elif "SVM" in model_name:
                         from sklearn.svm import SVC
-                        base = SVC(random_state=42)
-                        scoring = "accuracy"
+                        base = SVC(random_state=42); scoring = "accuracy"
                     elif "Random Forest" in model_name and pt == "Classification":
                         from sklearn.ensemble import RandomForestClassifier
-                        base = RandomForestClassifier(random_state=42)
-                        scoring = "accuracy"
+                        base = RandomForestClassifier(random_state=42); scoring = "accuracy"
                     elif "Linear Regression" in model_name:
                         from sklearn.linear_model import LinearRegression
-                        base = LinearRegression()
-                        scoring = "r2"
+                        base = LinearRegression(); scoring = "r2"
                     elif "SVR" in model_name:
                         from sklearn.svm import SVR
-                        base = SVR()
-                        scoring = "r2"
+                        base = SVR(); scoring = "r2"
                     elif "Random Forest" in model_name and pt == "Regression":
                         from sklearn.ensemble import RandomForestRegressor
-                        base = RandomForestRegressor(random_state=42)
-                        scoring = "r2"
+                        base = RandomForestRegressor(random_state=42); scoring = "r2"
                     else:
                         st.warning("Hyperparameter tuning not supported for K-Means via CV.")
                         st.stop()
 
                     with st.spinner("Running search... this may take a moment ⏳"):
                         if search_method == "GridSearchCV":
-                            searcher = GridSearchCV(base, param_grids, cv=cv_k,
-                                                    scoring=scoring, n_jobs=-1, refit=True)
+                            searcher = GridSearchCV(base, param_grids, cv=cv_k, scoring=scoring, n_jobs=-1, refit=True)
                         else:
-                            searcher = RandomizedSearchCV(base, param_grids, n_iter=n_iter,
-                                                          cv=cv_k, scoring=scoring,
-                                                          n_jobs=-1, refit=True, random_state=42)
+                            searcher = RandomizedSearchCV(base, param_grids, n_iter=n_iter, cv=cv_k,
+                                                          scoring=scoring, n_jobs=-1, refit=True, random_state=42)
                         searcher.fit(X_train_s, y_enc)
 
                     best_params = searcher.best_params_
                     best_score  = searcher.best_score_
 
                     st.success(f"✅ Best {scoring}: **{best_score:.4f}**")
-                    st.markdown("""<div style="font-family:Space Mono,monospace;font-size:11px;color:var(--accent);
-                                   letter-spacing:2px;margin:16px 0 8px;">BEST PARAMETERS</div>""",
+                    st.markdown("""<div style="font-size:11px;color:var(--muted);text-transform:uppercase;
+                                   letter-spacing:1.5px;font-weight:600;margin:16px 0 8px;">BEST PARAMETERS</div>""",
                                 unsafe_allow_html=True)
                     st.json(best_params)
 
-                    # Results table
                     results = pd.DataFrame(searcher.cv_results_).sort_values("rank_test_score")
                     show_cols = [c for c in results.columns if c.startswith("param_") or
                                  c in ["mean_test_score","std_test_score","rank_test_score"]]
-                    st.markdown("""<div style="font-family:Space Mono,monospace;font-size:11px;color:var(--accent);
-                                   letter-spacing:2px;margin:16px 0 8px;">ALL RESULTS</div>""",
+                    st.markdown("""<div style="font-size:11px;color:var(--muted);text-transform:uppercase;
+                                   letter-spacing:1.5px;font-weight:600;margin:16px 0 8px;">ALL RESULTS</div>""",
                                 unsafe_allow_html=True)
                     st.dataframe(results[show_cols].head(20), use_container_width=True)
 
-                    # Performance chart
                     fig = px.bar(results.head(15), y="mean_test_score",
                                  error_y="std_test_score",
                                  color="mean_test_score",
-                                 color_continuous_scale=["#ff6b6b","#ffd166","#00d4aa"],
-                                 template="plotly_dark",
+                                 color_continuous_scale=["#c0392b","#b8860b","#1a6fa8"],
+                                 template="plotly_white",
                                  title=f"Top 15 parameter combinations — {scoring}")
-                    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', font_color='#e2e8f0',
-                                      height=400, xaxis_title="Combination #",
-                                      yaxis_title=scoring, showlegend=False)
+                    fig.update_layout(**PLOTLY_LAYOUT, height=400,
+                                      xaxis_title="Combination #",
+                                      yaxis_title=scoring, showlegend=False,
+                                      title=dict(text=f"Top 15 parameter combinations — {scoring}",font=dict(color='#1a2332')))
                     st.plotly_chart(fig, use_container_width=True)
 
-                    # Update model with best
                     st.session_state.trained_model = searcher.best_estimator_
                     st.info("💡 The tuned model has been saved. Go back to Metrics to re-evaluate!")
 
@@ -1397,11 +1382,18 @@ elif st.session_state.step == 9:
             st.rerun()
 
 
-# ── Footer ────────────────────────────────────────────────────────────────────
+# ── FOOTER ────────────────────────────────────────────────────────────────────
 st.markdown("""
-<div style="text-align:center;padding:40px 20px 20px;border-top:1px solid var(--border);margin-top:40px;">
-    <span style="font-family:Space Mono,monospace;font-size:11px;color:var(--muted);">
-        ML Pipeline Studio · Financing Healthcare · Built with Streamlit + Plotly
+<div style="text-align:center;padding:32px 20px 20px;border-top:1px solid var(--border);margin-top:40px;">
+    <div style="display:flex;justify-content:center;align-items:center;gap:24px;margin-bottom:12px;">
+        <span style="font-size:12px;color:var(--muted);">💊 Clinical Cost Modeling</span>
+        <span style="color:var(--border);">|</span>
+        <span style="font-size:12px;color:var(--muted);">📊 Expenditure Analytics</span>
+        <span style="color:var(--border);">|</span>
+        <span style="font-size:12px;color:var(--muted);">🌐 Global Health Finance</span>
+    </div>
+    <span style="font-family:Inter,sans-serif;font-size:11px;color:var(--muted);">
+        ML Pipeline Studio · Healthcare Finance Analytics · Built with Streamlit + Plotly
     </span>
 </div>
 """, unsafe_allow_html=True)
