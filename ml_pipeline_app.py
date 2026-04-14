@@ -44,7 +44,6 @@ html, body, [data-testid="stAppViewContainer"] {
     font-family: 'Inter', sans-serif !important;
 }
 
-/* ── Global text color fix ── */
 p, span, div, label, li, h1, h2, h3, h4, h5, h6 {
     color: var(--text);
 }
@@ -65,7 +64,6 @@ p, span, div, label, li, h1, h2, h3, h4, h5, h6 {
     border-right: 1px solid #1a4a6e !important;
 }
 
-/* ── Buttons ── */
 .stButton > button {
     background: var(--accent) !important;
     color: #ffffff !important;
@@ -84,7 +82,6 @@ p, span, div, label, li, h1, h2, h3, h4, h5, h6 {
     box-shadow: 0 4px 12px rgba(26,111,168,0.25) !important;
 }
 
-/* ── Form elements ── */
 .stSelectbox > div > div,
 .stMultiSelect > div > div {
     background: var(--surface) !important;
@@ -93,7 +90,6 @@ p, span, div, label, li, h1, h2, h3, h4, h5, h6 {
     color: var(--text) !important;
 }
 
-/* Dropdown options */
 .stSelectbox div[data-baseweb="select"] > div,
 [data-baseweb="popover"] ul li,
 [data-baseweb="menu"] ul li {
@@ -101,7 +97,6 @@ p, span, div, label, li, h1, h2, h3, h4, h5, h6 {
     color: var(--text) !important;
 }
 
-/* Multiselect tags */
 .stMultiSelect span[data-baseweb="tag"] {
     background: var(--accent-light) !important;
     color: var(--accent) !important;
@@ -119,14 +114,12 @@ p, span, div, label, li, h1, h2, h3, h4, h5, h6 {
 
 .stSlider > div > div > div { background: var(--accent) !important; }
 
-/* Slider value labels */
 .stSlider [data-testid="stTickBarMin"],
 .stSlider [data-testid="stTickBarMax"],
 .stSlider .stSlider > label {
     color: var(--text-body) !important;
 }
 
-/* ── File uploader ── */
 [data-testid="stFileUploader"] {
     background: var(--accent-light) !important;
     border: 2px dashed var(--accent) !important;
@@ -138,7 +131,6 @@ p, span, div, label, li, h1, h2, h3, h4, h5, h6 {
     color: var(--text-body) !important;
 }
 
-/* ── DataFrame ── */
 [data-testid="stDataFrame"] { border-radius: 8px !important; }
 [data-testid="stDataFrame"] th {
     background: var(--surface2) !important;
@@ -148,7 +140,6 @@ p, span, div, label, li, h1, h2, h3, h4, h5, h6 {
     color: var(--text-body) !important;
 }
 
-/* ── Expander ── */
 .streamlit-expanderHeader {
     background: var(--surface2) !important;
     border: 1px solid var(--border) !important;
@@ -165,7 +156,6 @@ p, span, div, label, li, h1, h2, h3, h4, h5, h6 {
     border-top: none !important;
 }
 
-/* ── Metrics ── */
 [data-testid="stMetric"] {
     background: var(--surface) !important;
     border: 1px solid var(--border) !important;
@@ -188,7 +178,6 @@ p, span, div, label, li, h1, h2, h3, h4, h5, h6 {
     color: var(--text-body) !important;
 }
 
-/* ── Alert boxes ── */
 .stSuccess, .stSuccess p, .stSuccess span {
     background: var(--accent2-light) !important;
     border: 1px solid var(--accent2) !important;
@@ -214,7 +203,6 @@ p, span, div, label, li, h1, h2, h3, h4, h5, h6 {
     color: #0d3a5c !important;
 }
 
-/* ── Radio buttons ── */
 .stRadio > div { flex-direction: row !important; gap: 12px !important; }
 .stRadio > div > label {
     background: var(--surface) !important;
@@ -229,13 +217,11 @@ p, span, div, label, li, h1, h2, h3, h4, h5, h6 {
     border-color: var(--accent) !important;
     background: var(--accent-light) !important;
 }
-/* Radio label text */
 .stRadio label p,
 .stRadio label span {
     color: var(--text-body) !important;
 }
 
-/* ── Tabs ── */
 .stTabs [data-baseweb="tab-list"] {
     background: var(--surface2) !important;
     border-radius: 8px 8px 0 0 !important;
@@ -258,12 +244,10 @@ p, span, div, label, li, h1, h2, h3, h4, h5, h6 {
     padding: 16px !important;
 }
 
-/* ── Checkboxes ── */
 .stCheckbox label, .stCheckbox span {
     color: var(--text-body) !important;
 }
 
-/* ── General label/text overrides ── */
 .stSelectbox label, .stMultiSelect label, .stTextInput label,
 .stNumberInput label, .stSlider label, .stFileUploader label,
 .stCheckbox label, .stRadio label, .stTextArea label {
@@ -271,19 +255,16 @@ p, span, div, label, li, h1, h2, h3, h4, h5, h6 {
     font-weight: 500 !important;
 }
 
-/* ── Spinner ── */
 .stSpinner > div {
     border-color: var(--accent) !important;
 }
 
-/* ── JSON display ── */
 .stJson {
     background: var(--surface2) !important;
     border: 1px solid var(--border) !important;
     border-radius: 6px !important;
 }
 
-/* ── Plotly chart container ── */
 [data-testid="stPlotlyChart"] {
     border-radius: 8px !important;
     overflow: hidden !important;
@@ -315,7 +296,6 @@ def step_badge(n, label, done=False, active=False):
     else:
         bg, col, border = "var(--surface)", "var(--muted)", "var(--border)"
 
-    # Label color: white on active, accent2 on done, muted on pending
     label_col = "#ffffff" if active else ("var(--accent2)" if done else "var(--muted)")
 
     return f"""
@@ -374,6 +354,17 @@ def section_header(step_n, title, subtitle=""):
         <div style="height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2),transparent);border-radius:2px;margin-top:12px;margin-left:50px;width:200px;"></div>
     </div>
     """, unsafe_allow_html=True)
+
+
+# ── Helper: check if stratify is feasible ─────────────────────────────────────
+def can_stratify(y):
+    """Return True only if every class has at least 2 members."""
+    if not pd.api.types.is_categorical_dtype(y) and not pd.api.types.is_object_dtype(y):
+        # For numeric targets, check value counts
+        counts = pd.Series(y).value_counts()
+    else:
+        counts = pd.Series(y).value_counts()
+    return bool((counts >= 2).all())
 
 
 # ── Session state defaults ─────────────────────────────────────────────────────
@@ -1010,7 +1001,12 @@ elif st.session_state.step == 5:
     with col_l:
         test_size = st.slider("Test set size (%)", 10, 40, 20) / 100
         random_state = st.number_input("Random seed", 0, 999, 42)
-        stratify = st.checkbox("Stratify split (classification)", value=(st.session_state.problem_type=="Classification"))
+
+        # Only offer stratify option for classification
+        stratify_requested = st.checkbox(
+            "Stratify split (classification)",
+            value=(st.session_state.problem_type == "Classification")
+        )
 
         if st.button("✂️ Split Dataset", use_container_width=True):
             from sklearn.model_selection import train_test_split
@@ -1018,17 +1014,35 @@ elif st.session_state.step == 5:
             X = df_sub[features]
             y = df_sub[target]
 
-            strat = y if (stratify and st.session_state.problem_type == "Classification") else None
+            # ── FIX: validate stratify feasibility before using it ──
+            strat = None
+            if stratify_requested and st.session_state.problem_type == "Classification":
+                if can_stratify(y):
+                    strat = y
+                else:
+                    st.warning(
+                        "⚠️ **Stratification disabled automatically** — one or more classes have "
+                        "only 1 sample, which is too few for stratified splitting. "
+                        "Proceeding with a standard random split instead.\n\n"
+                        "💡 Tip: If your target is a high-cardinality column like `country`, "
+                        "consider using a numeric column (e.g. `che_gdp`) as the target instead."
+                    )
+
             try:
                 X_train, X_test, y_train, y_test = train_test_split(
-                    X, y, test_size=test_size, random_state=random_state, stratify=strat)
+                    X, y, test_size=test_size, random_state=random_state, stratify=strat
+                )
                 st.session_state.X_train = X_train
                 st.session_state.X_test = X_test
                 st.session_state.y_train = y_train
                 st.session_state.y_test = y_test
                 st.session_state.test_size = test_size
                 st.session_state.random_state = random_state
-                st.success("✅ Split successful!")
+                st.success(
+                    f"✅ Split successful! "
+                    f"{'Stratified · ' if strat is not None else 'Random · '}"
+                    f"Train: {len(X_train):,} · Test: {len(X_test):,}"
+                )
             except Exception as e:
                 st.error(f"Split error: {e}")
 
@@ -1098,7 +1112,6 @@ elif st.session_state.step == 6:
             active = selected_model == name
             border = "var(--accent)" if active else "var(--border)"
             bg = "var(--accent-light)" if active else "var(--surface)"
-            # Text color: dark on accent-light, muted on surface
             desc_color = "#0d3b5e" if active else "var(--muted)"
             badge_text = f'<span style="color:var(--accent);font-weight:600;">✓ Selected</span>' if active else f'<span style="color:{desc_color};">{desc}</span>'
 
@@ -1156,7 +1169,8 @@ elif st.session_state.step == 7:
             if X_train is None:
                 st.error("Please complete data split first.")
             else:
-                Xs = StandardScaler().fit_transform(X_train.fillna(0))
+                sc = StandardScaler()
+                Xs = sc.fit_transform(X_train.fillna(0))
                 ys = y_train.fillna(0)
 
                 le = None
@@ -1195,7 +1209,16 @@ elif st.session_state.step == 7:
                             st.success("✅ K-Means clustering complete!")
                             st.rerun()
 
-                        cv = StratifiedKFold(n_splits=k, shuffle=True, random_state=42)
+                        # ── FIX: use StratifiedKFold only when feasible ──
+                        unique_counts = pd.Series(ys).value_counts()
+                        if (unique_counts >= k).all():
+                            cv = StratifiedKFold(n_splits=k, shuffle=True, random_state=42)
+                        else:
+                            cv = KFold(n_splits=k, shuffle=True, random_state=42)
+                            st.info(
+                                f"ℹ️ Switched to standard KFold — some classes have fewer than {k} samples "
+                                "so stratified splitting is not possible."
+                            )
                         scores = cross_val_score(model, Xs, ys, cv=cv, scoring=scoring)
                         model.fit(Xs, ys)
 
