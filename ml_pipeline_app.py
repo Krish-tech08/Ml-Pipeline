@@ -44,7 +44,6 @@ html, body, [data-testid="stAppViewContainer"] {
     font-family: 'Inter', sans-serif !important;
 }
 
-/* Only target streamlit native elements, NOT SVG inside plotly */
 [data-testid="stAppViewContainer"] > * p,
 [data-testid="stAppViewContainer"] > * span:not(.legend-label):not(.xtick):not(.ytick),
 [data-testid="stAppViewContainer"] > * label,
@@ -280,7 +279,6 @@ h1, h2, h3, h4, h5, h6 {
 
 hr { border-color: var(--border) !important; }
 
-/* Ensure Plotly SVG text is always visible - do NOT override plotly internals via CSS */
 [data-testid="stPlotlyChart"] svg text {
     fill: #1a2332 !important;
 }
@@ -384,13 +382,48 @@ def can_stratify(y):
     return bool((counts >= 2).all())
 
 
+# ── Helper: encode target for sklearn ─────────────────────────────────────────
+def encode_target(y_series, problem_type):
+    """
+    Returns (y_encoded, label_encoder_or_None).
+    For regression: tries numeric cast; if the column is string-typed,
+    raises a clear ValueError so callers can show a friendly message.
+    For classification: label-encodes strings automatically.
+    """
+    from sklearn.preprocessing import LabelEncoder
+    y = y_series.fillna(0) if problem_type != "Classification" else y_series
+
+    if problem_type == "Classification":
+        if not pd.api.types.is_numeric_dtype(y):
+            le = LabelEncoder()
+            return le.fit_transform(y.astype(str)), le
+        else:
+            try:
+                return y.astype(int).values, None
+            except (ValueError, TypeError):
+                le = LabelEncoder()
+                return le.fit_transform(y.astype(str)), le
+    else:
+        # Regression — target must be numeric
+        if not pd.api.types.is_numeric_dtype(y):
+            raise ValueError(
+                f"The selected target column contains non-numeric values "
+                f"(e.g. '{y.dropna().iloc[0]}'). "
+                f"Regression requires a numeric target. "
+                f"Please go back to Step 2 and select a numeric column such as "
+                f"'che_gdp', 'che_pc_usd', or 'gghed_che'."
+            )
+        return y.fillna(0).values, None
+
+
 # ── Session state defaults ─────────────────────────────────────────────────────
 defaults = dict(
     step=0, problem_type=None, df=None, target=None, features=None,
     df_clean=None, selected_features=None, X_train=None, X_test=None,
     y_train=None, y_test=None, model=None, model_name=None,
     k_folds=5, trained_model=None, cv_scores=None,
-    test_size=0.2, random_state=42, outlier_indices=[]
+    test_size=0.2, random_state=42, outlier_indices=[],
+    label_encoder=None,
 )
 for k, v in defaults.items():
     if k not in st.session_state:
@@ -441,7 +474,6 @@ st.markdown("""
 render_stepper(st.session_state.step)
 
 # ── Plotly theme ───────────────────────────────────────────────────────────────
-# Explicit font settings ensure labels/tick text always render clearly
 PLOTLY_LAYOUT = dict(
     paper_bgcolor='rgba(255,255,255,1)',
     plot_bgcolor='rgba(248,251,254,1)',
@@ -450,7 +482,6 @@ PLOTLY_LAYOUT = dict(
 COLORS = ["#1a6fa8", "#0e8c6a", "#b8860b", "#c0392b", "#5b4fcf", "#0891b2"]
 
 def apply_axis_style(fig, xaxis_title="", yaxis_title=""):
-    """Apply consistent axis label and tick styling to a figure."""
     axis_style = dict(
         tickfont=dict(color='#1a2332', size=11, family='Inter, sans-serif'),
         title_font=dict(color='#2d3e50', size=12, family='Inter, sans-serif'),
@@ -579,7 +610,24 @@ elif st.session_state.step == 1:
                 st.markdown("""<div style="font-size:11px;color:var(--muted);text-transform:uppercase;
                                letter-spacing:1.5px;font-weight:600;margin:16px 0 8px;">TARGET VARIABLE</div>""",
                             unsafe_allow_html=True)
-                target = st.selectbox("Select the column to predict", df.columns.tolist())
+
+                # For Regression, highlight numeric columns as recommended
+                pt = st.session_state.problem_type
+                all_cols = df.columns.tolist()
+                numeric_cols_all = df.select_dtypes(include=np.number).columns.tolist()
+
+                if pt == "Regression" and numeric_cols_all:
+                    st.info(f"💡 **Regression** requires a numeric target. Numeric columns: {', '.join(numeric_cols_all[:8])}")
+
+                target = st.selectbox("Select the column to predict", all_cols)
+
+                # Warn immediately if regression target is non-numeric
+                if pt == "Regression" and not pd.api.types.is_numeric_dtype(df[target]):
+                    st.warning(
+                        f"⚠️ Column **'{target}'** contains text values. "
+                        f"Regression needs a numeric target — please select a numeric column above."
+                    )
+
                 st.session_state.target = target
 
                 other_cols = [c for c in df.columns if c != target]
@@ -699,7 +747,6 @@ elif st.session_state.step == 2:
                 n_cols = 3
                 n_rows = -(-len(cols_to_plot) // n_cols)
                 fig = make_subplots(rows=n_rows, cols=n_cols, subplot_titles=cols_to_plot)
-                # Style subplot titles
                 for ann in fig.layout.annotations:
                     ann.font = dict(color='#1a2332', size=11, family='Inter, sans-serif')
 
@@ -717,7 +764,6 @@ elif st.session_state.step == 2:
                     **PLOTLY_LAYOUT,
                     showlegend=False,
                 )
-                # Apply axis style to all subplots
                 fig.update_xaxes(
                     tickfont=dict(color='#1a2332', size=10, family='Inter, sans-serif'),
                     title_font=dict(color='#2d3e50', size=11),
@@ -755,14 +801,11 @@ elif st.session_state.step == 2:
                 fig.update_yaxes(
                     tickfont=dict(color='#1a2332', size=10, family='Inter, sans-serif'),
                 )
-                # Make text_auto values visible
                 fig.update_traces(textfont=dict(color='#1a2332', size=9))
                 st.plotly_chart(fig, use_container_width=True)
 
                 if target in numeric_cols:
                     top_corr = corr[target].drop(target).abs().sort_values(ascending=False).head(10)
-                    # Use marker_color (list) instead of color= to avoid Plotly treating
-                    # a hex-string array as a continuous color scale
                     bar_colors = ['#1a6fa8' if v >= top_corr.mean() else '#b8860b'
                                   for v in top_corr.values]
                     fig2 = go.Figure(go.Bar(
@@ -804,7 +847,6 @@ elif st.session_state.step == 2:
             if miss.empty:
                 st.success("✅ No missing values detected!")
             else:
-                # Use marker_color list for discrete coloring
                 miss_colors = [
                     f'rgba(192,57,43,{0.4 + 0.6 * (v / miss.max())})'
                     for v in miss.values
@@ -992,8 +1034,6 @@ elif st.session_state.step == 3:
 
                 if len(feat_for_outlier) >= 2:
                     is_out = pd.Series(df.index.isin(outlier_idx), index=df.index)
-                    # Build lists of colors for each point directly — avoids color= ambiguity
-                    point_colors = is_out.map({True: "#c0392b", False: "#1a6fa8"})
                     point_labels = is_out.map({True: "Outlier", False: "Normal"})
 
                     fig = px.scatter(
@@ -1067,6 +1107,7 @@ elif st.session_state.step == 4:
 
     df = st.session_state.df_clean.copy().dropna()
     target = st.session_state.target
+    pt = st.session_state.problem_type
     numeric_cols = [c for c in df.select_dtypes(include=np.number).columns if c != target]
 
     method = st.radio("Selection method",
@@ -1089,7 +1130,6 @@ elif st.session_state.step == 4:
                     removed = [c for c, m in zip(numeric_cols, mask) if not m]
 
                     variances = df[numeric_cols].var().sort_values(ascending=False)
-                    # Use marker_color list for clear per-bar coloring
                     bar_colors = ['#1a6fa8' if v >= thresh else '#c0392b' for v in variances.values]
                     fig = go.Figure(go.Bar(
                         x=variances.index.tolist(),
@@ -1106,7 +1146,6 @@ elif st.session_state.step == 4:
                         annotation_text=f"  Threshold = {thresh}",
                         annotation_font=dict(color='#b8860b', size=11),
                     )
-                    # Add a manual legend via invisible scatter
                     fig.add_trace(go.Scatter(
                         x=[None], y=[None], mode='markers',
                         marker=dict(color='#1a6fa8', size=10, symbol='square'),
@@ -1190,6 +1229,8 @@ elif st.session_state.step == 4:
                 )
                 st.plotly_chart(fig, use_container_width=True)
                 st.info(f"Keeping **{len(selected)}** features above threshold")
+            else:
+                st.info("Target column is not numeric — correlation method requires a numeric target. Using all features.")
 
         elif method == "Information Gain (Mutual Info)":
             from sklearn.feature_selection import mutual_info_regression, mutual_info_classif
@@ -1198,12 +1239,24 @@ elif st.session_state.step == 4:
             X_mi = df[numeric_cols].fillna(0)
             y_mi = df[target]
 
-            if st.session_state.problem_type == "Classification":
+            # ── FIX: always use the right MI function and encode target if needed ──
+            target_is_numeric = pd.api.types.is_numeric_dtype(y_mi)
+
+            if pt == "Classification" or not target_is_numeric:
+                # For classification OR when target is a string in regression mode,
+                # use classif-flavoured MI (treats target as discrete)
+                from sklearn.preprocessing import LabelEncoder
+                if not target_is_numeric:
+                    le_mi = LabelEncoder()
+                    y_mi_enc = le_mi.fit_transform(y_mi.astype(str))
+                else:
+                    y_mi_enc = y_mi.astype(int)
                 try:
-                    mi = mutual_info_classif(X_mi, y_mi, random_state=42)
+                    mi = mutual_info_classif(X_mi, y_mi_enc, random_state=42)
                 except Exception:
-                    mi = mutual_info_regression(X_mi, y_mi, random_state=42)
+                    mi = mutual_info_regression(X_mi, y_mi_enc, random_state=42)
             else:
+                # Regression with numeric target
                 mi = mutual_info_regression(X_mi, y_mi.fillna(0), random_state=42)
 
             mi_series = pd.Series(mi, index=numeric_cols).sort_values(ascending=False)
@@ -1283,7 +1336,19 @@ elif st.session_state.step == 5:
 
     df = st.session_state.df_clean.dropna()
     target = st.session_state.target
+    pt = st.session_state.problem_type
     features = st.session_state.selected_features or [c for c in df.select_dtypes(include=np.number).columns if c != target]
+
+    # Warn if regression target is non-numeric before split
+    if pt == "Regression" and not pd.api.types.is_numeric_dtype(df[target]):
+        st.error(
+            f"❌ Target column **'{target}'** contains text values (e.g. '{df[target].dropna().iloc[0]}').\n\n"
+            f"Regression requires a numeric target. Please go back to **Step 2 (Data Input)** "
+            f"and select a numeric column such as `che_gdp`, `che_pc_usd`, or `gghed_che`."
+        )
+        if st.button("← Back to Data Input"):
+            st.session_state.step = 1; st.rerun()
+        st.stop()
 
     col_l, col_r = st.columns([2, 3])
 
@@ -1293,7 +1358,7 @@ elif st.session_state.step == 5:
 
         stratify_requested = st.checkbox(
             "Stratify split (classification)",
-            value=(st.session_state.problem_type == "Classification")
+            value=(pt == "Classification")
         )
 
         if st.button("✂️ Split Dataset", use_container_width=True):
@@ -1303,7 +1368,7 @@ elif st.session_state.step == 5:
             y = df_sub[target]
 
             strat = None
-            if stratify_requested and st.session_state.problem_type == "Classification":
+            if stratify_requested and pt == "Classification":
                 if can_stratify(y):
                     strat = y
                 else:
@@ -1464,7 +1529,7 @@ elif st.session_state.step == 7:
 
         if st.button("🚀 Train Model", use_container_width=True):
             from sklearn.model_selection import cross_val_score, KFold, StratifiedKFold
-            from sklearn.preprocessing import StandardScaler, LabelEncoder
+            from sklearn.preprocessing import StandardScaler
 
             X_train = st.session_state.X_train
             y_train = st.session_state.y_train
@@ -1474,19 +1539,13 @@ elif st.session_state.step == 7:
             else:
                 sc = StandardScaler()
                 Xs = sc.fit_transform(X_train.fillna(0))
-                ys = y_train.fillna(0)
 
-                le = None
-                if pt == "Classification":
-                    if not pd.api.types.is_numeric_dtype(ys):
-                        le = LabelEncoder()
-                        ys = le.fit_transform(ys.astype(str))
-                    else:
-                        try:
-                            ys = ys.astype(int)
-                        except (ValueError, TypeError):
-                            le = LabelEncoder()
-                            ys = le.fit_transform(ys.astype(str))
+                # ── FIX: encode target robustly for both classification and regression ──
+                try:
+                    ys, le = encode_target(y_train, pt)
+                except ValueError as enc_err:
+                    st.error(str(enc_err))
+                    st.stop()
 
                 kernel = st.session_state.get("svm_kernel", "rbf")
                 try:
@@ -1509,6 +1568,7 @@ elif st.session_state.step == 7:
                             model.fit(Xs)
                             st.session_state.trained_model = model
                             st.session_state.cv_scores = None
+                            st.session_state["label_encoder"] = le
                             st.success("✅ K-Means clustering complete!")
                             st.rerun()
 
@@ -1540,6 +1600,7 @@ elif st.session_state.step == 7:
                             model.fit(Xs)
                             st.session_state.trained_model = model
                             st.session_state.cv_scores = None
+                            st.session_state["label_encoder"] = le
                             st.success("✅ K-Means clustering complete!")
                             st.rerun()
 
@@ -1579,7 +1640,6 @@ elif st.session_state.step == 7:
                 annotation_text=f"  Mean = {mean_score:.4f}",
                 annotation_font=dict(color='#b8860b', size=12),
             )
-            # Legend markers
             fig.add_trace(go.Scatter(x=[None], y=[None], mode='markers',
                 marker=dict(color='#1a6fa8', size=10, symbol='square'), name='≥ Mean', showlegend=True))
             fig.add_trace(go.Scatter(x=[None], y=[None], mode='markers',
@@ -1636,34 +1696,22 @@ elif st.session_state.step == 8:
     if model is None or X_train is None:
         st.warning("Please train a model first.")
     else:
-        from sklearn.preprocessing import StandardScaler, LabelEncoder
+        from sklearn.preprocessing import StandardScaler
         sc = StandardScaler()
         X_train_s = sc.fit_transform(X_train.fillna(0))
         X_test_s = sc.transform(X_test.fillna(0))
 
-        y_train_raw = y_train.fillna(0)
-        y_test_raw = y_test.fillna(0)
-
-        if pt == "Classification":
-            if not pd.api.types.is_numeric_dtype(y_train_raw):
-                _le = LabelEncoder()
-                all_labels = pd.concat([y_train_raw.astype(str), y_test_raw.astype(str)])
-                _le.fit(all_labels)
-                y_train_enc = _le.transform(y_train_raw.astype(str))
-                y_test_enc  = _le.transform(y_test_raw.astype(str))
+        # ── FIX: use shared encode_target helper ──
+        try:
+            y_train_enc, _le_train = encode_target(y_train, pt)
+            # For test set in classification, reuse the same label encoder fitted on train
+            if pt == "Classification" and _le_train is not None:
+                y_test_enc = _le_train.transform(y_test.fillna("").astype(str))
             else:
-                try:
-                    y_train_enc = y_train_raw.astype(int)
-                    y_test_enc  = y_test_raw.astype(int)
-                except (ValueError, TypeError):
-                    _le = LabelEncoder()
-                    all_labels = pd.concat([y_train_raw.astype(str), y_test_raw.astype(str)])
-                    _le.fit(all_labels)
-                    y_train_enc = _le.transform(y_train_raw.astype(str))
-                    y_test_enc  = _le.transform(y_test_raw.astype(str))
-        else:
-            y_train_enc = y_train_raw
-            y_test_enc  = y_test_raw
+                y_test_enc, _ = encode_target(y_test, pt)
+        except ValueError as enc_err:
+            st.error(str(enc_err))
+            st.stop()
 
         try:
             if hasattr(model, 'predict'):
@@ -1745,8 +1793,7 @@ elif st.session_state.step == 8:
                 else:
                     st.success("🟢 Model appears well-fitted.")
 
-                # Actual vs Predicted scatter
-                y_test_vals = y_test_enc.values if hasattr(y_test_enc, 'values') else y_test_enc
+                y_test_vals = y_test_enc if isinstance(y_test_enc, np.ndarray) else np.array(y_test_enc)
                 y_min = float(y_test_vals.min())
                 y_max = float(y_test_vals.max())
 
@@ -1784,7 +1831,6 @@ elif st.session_state.step == 8:
                 )
                 st.plotly_chart(fig, use_container_width=True)
 
-                # Residuals histogram
                 residuals = y_test_vals - test_preds
                 fig2 = go.Figure(go.Histogram(
                     x=residuals,
@@ -1834,27 +1880,20 @@ elif st.session_state.step == 9:
     pt = st.session_state.problem_type
     X_train = st.session_state.X_train
     y_train = st.session_state.y_train
-    le = st.session_state.get("label_encoder", None)
 
     if X_train is None:
         st.warning("Please complete training first.")
     else:
-        from sklearn.preprocessing import StandardScaler, LabelEncoder
+        from sklearn.preprocessing import StandardScaler
         sc = StandardScaler()
         X_train_s = sc.fit_transform(X_train.fillna(0))
-        y_train_raw = y_train.fillna(0)
-        if pt == "Classification":
-            if not pd.api.types.is_numeric_dtype(y_train_raw):
-                _le2 = LabelEncoder()
-                y_enc = _le2.fit_transform(y_train_raw.astype(str))
-            else:
-                try:
-                    y_enc = y_train_raw.astype(int)
-                except (ValueError, TypeError):
-                    _le2 = LabelEncoder()
-                    y_enc = _le2.fit_transform(y_train_raw.astype(str))
-        else:
-            y_enc = y_train_raw
+
+        # ── FIX: use shared encode_target helper ──
+        try:
+            y_enc, _le = encode_target(y_train, pt)
+        except ValueError as enc_err:
+            st.error(str(enc_err))
+            st.stop()
 
         search_method = st.radio("Search method", ["GridSearchCV", "RandomizedSearchCV"], horizontal=True)
         cv_k = st.number_input("CV folds for tuning", 2, 10, 3)
