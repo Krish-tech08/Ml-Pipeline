@@ -44,6 +44,11 @@ html, body, [data-testid="stAppViewContainer"] {
     font-family: 'Inter', sans-serif !important;
 }
 
+/* ── Global text color reset ── */
+[data-testid="stAppViewContainer"] * {
+    color: var(--text);
+}
+
 [data-testid="stAppViewContainer"] > * p,
 [data-testid="stAppViewContainer"] > * span:not(.legend-label):not(.xtick):not(.ytick),
 [data-testid="stAppViewContainer"] > * label,
@@ -71,6 +76,132 @@ h1, h2, h3, h4, h5, h6 {
     border-right: 1px solid #1a4a6e !important;
 }
 
+/* ══════════════════════════════════════
+   DATAFRAME / TABLE — full light override
+   ══════════════════════════════════════ */
+[data-testid="stDataFrame"],
+[data-testid="stDataFrame"] > div,
+[data-testid="stDataFrame"] iframe,
+.stDataFrame,
+div[data-testid="stDataFrameResizable"] {
+    background: var(--surface) !important;
+    border-radius: 8px !important;
+    border: 1px solid var(--border) !important;
+}
+
+/* Arrow table cells */
+[data-testid="stDataFrame"] th,
+[data-testid="stDataFrame"] td,
+[data-testid="stDataFrame"] [role="columnheader"],
+[data-testid="stDataFrame"] [role="gridcell"],
+[data-testid="stDataFrame"] .dvn-scroller,
+[data-testid="stDataFrame"] .stDataFrameGlideDataEditor {
+    background: var(--surface) !important;
+    color: var(--text) !important;
+    border-color: var(--border) !important;
+}
+
+[data-testid="stDataFrame"] th,
+[data-testid="stDataFrame"] [role="columnheader"] {
+    background: var(--surface2) !important;
+    color: var(--text) !important;
+    font-weight: 600 !important;
+}
+
+/* Glide data editor canvas overrides */
+.gdg-style,
+.gdg-cell,
+.gdg-header {
+    background: var(--surface) !important;
+    color: var(--text) !important;
+}
+
+/* ══════════════════════════════════════
+   EXPANDER — light background fix
+   ══════════════════════════════════════ */
+[data-testid="stExpander"],
+[data-testid="stExpander"] > div,
+details,
+details > summary {
+    background: var(--surface) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 8px !important;
+    color: var(--text) !important;
+}
+
+details > summary {
+    background: var(--surface2) !important;
+    color: var(--text) !important;
+    padding: 10px 16px !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+    border: none !important;
+    cursor: pointer !important;
+}
+
+details[open] > summary {
+    border-radius: 8px 8px 0 0 !important;
+}
+
+details > summary * ,
+details > summary p,
+details > summary span {
+    color: var(--text) !important;
+}
+
+details > div,
+details > div * {
+    background: var(--surface) !important;
+    color: var(--text) !important;
+}
+
+.streamlit-expanderHeader {
+    background: var(--surface2) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 6px !important;
+    color: var(--text) !important;
+}
+.streamlit-expanderHeader p,
+.streamlit-expanderHeader span,
+.streamlit-expanderHeader svg {
+    color: var(--text) !important;
+    fill: var(--text) !important;
+}
+.streamlit-expanderContent {
+    background: var(--surface) !important;
+    border: 1px solid var(--border) !important;
+    border-top: none !important;
+    color: var(--text) !important;
+}
+.streamlit-expanderContent * {
+    color: var(--text) !important;
+}
+
+/* ══════════════════════════════════════
+   TOOLTIP / POPOVER — dark tooltip fix
+   ══════════════════════════════════════ */
+[data-baseweb="tooltip"],
+[data-baseweb="popover"],
+[role="tooltip"],
+div[data-placement],
+div[data-testid="stTooltipContent"] {
+    background: var(--surface) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 6px !important;
+    color: var(--text) !important;
+    box-shadow: 0 4px 12px rgba(26,111,168,0.15) !important;
+}
+
+[data-baseweb="tooltip"] *,
+[data-baseweb="popover"] *,
+[role="tooltip"] * {
+    color: var(--text) !important;
+    background: var(--surface) !important;
+}
+
+/* ══════════════════════════════════════
+   BUTTONS
+   ══════════════════════════════════════ */
 .stButton > button {
     background: var(--accent) !important;
     color: #ffffff !important;
@@ -89,6 +220,9 @@ h1, h2, h3, h4, h5, h6 {
     box-shadow: 0 4px 12px rgba(26,111,168,0.25) !important;
 }
 
+/* ══════════════════════════════════════
+   SELECT / MULTISELECT
+   ══════════════════════════════════════ */
 .stSelectbox > div > div,
 .stMultiSelect > div > div {
     background: var(--surface) !important;
@@ -99,9 +233,15 @@ h1, h2, h3, h4, h5, h6 {
 
 .stSelectbox div[data-baseweb="select"] > div,
 [data-baseweb="popover"] ul li,
-[data-baseweb="menu"] ul li {
+[data-baseweb="menu"] ul li,
+[data-baseweb="menu"],
+[data-baseweb="menu"] * {
     background: var(--surface) !important;
     color: var(--text) !important;
+}
+
+[data-baseweb="menu"] ul li:hover {
+    background: var(--accent-light) !important;
 }
 
 .stMultiSelect span[data-baseweb="tag"] {
@@ -112,6 +252,9 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--accent) !important;
 }
 
+/* ══════════════════════════════════════
+   NUMBER INPUT / SLIDER
+   ══════════════════════════════════════ */
 .stNumberInput > div > div > input {
     background: var(--surface) !important;
     border: 1px solid var(--border) !important;
@@ -127,6 +270,9 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--text-body) !important;
 }
 
+/* ══════════════════════════════════════
+   FILE UPLOADER
+   ══════════════════════════════════════ */
 [data-testid="stFileUploader"] {
     background: var(--accent-light) !important;
     border: 2px dashed var(--accent) !important;
@@ -138,31 +284,9 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--text-body) !important;
 }
 
-[data-testid="stDataFrame"] { border-radius: 8px !important; }
-[data-testid="stDataFrame"] th {
-    background: var(--surface2) !important;
-    color: var(--text) !important;
-}
-[data-testid="stDataFrame"] td {
-    color: var(--text-body) !important;
-}
-
-.streamlit-expanderHeader {
-    background: var(--surface2) !important;
-    border: 1px solid var(--border) !important;
-    border-radius: 6px !important;
-    color: var(--text) !important;
-}
-.streamlit-expanderHeader p,
-.streamlit-expanderHeader span {
-    color: var(--text) !important;
-}
-.streamlit-expanderContent {
-    background: var(--surface) !important;
-    border: 1px solid var(--border) !important;
-    border-top: none !important;
-}
-
+/* ══════════════════════════════════════
+   METRICS
+   ══════════════════════════════════════ */
 [data-testid="stMetric"] {
     background: var(--surface) !important;
     border: 1px solid var(--border) !important;
@@ -185,6 +309,9 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--text-body) !important;
 }
 
+/* ══════════════════════════════════════
+   ALERTS
+   ══════════════════════════════════════ */
 .stSuccess, .stSuccess p, .stSuccess span {
     background: var(--accent2-light) !important;
     border: 1px solid var(--accent2) !important;
@@ -210,6 +337,17 @@ h1, h2, h3, h4, h5, h6 {
     color: #0d3a5c !important;
 }
 
+/* Alert container wrappers */
+div[data-testid="stAlert"],
+div[data-testid="stAlert"] > div,
+div[data-testid="stAlert"] p,
+div[data-testid="stAlert"] span {
+    color: inherit !important;
+}
+
+/* ══════════════════════════════════════
+   RADIO BUTTONS
+   ══════════════════════════════════════ */
 .stRadio > div { flex-direction: row !important; gap: 12px !important; }
 .stRadio > div > label {
     background: var(--surface) !important;
@@ -229,6 +367,9 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--text-body) !important;
 }
 
+/* ══════════════════════════════════════
+   TABS
+   ══════════════════════════════════════ */
 .stTabs [data-baseweb="tab-list"] {
     background: var(--surface2) !important;
     border-radius: 8px 8px 0 0 !important;
@@ -237,6 +378,7 @@ h1, h2, h3, h4, h5, h6 {
 .stTabs [data-baseweb="tab"] {
     color: var(--muted) !important;
     font-weight: 500 !important;
+    background: transparent !important;
 }
 .stTabs [aria-selected="true"] {
     color: var(--accent) !important;
@@ -249,8 +391,15 @@ h1, h2, h3, h4, h5, h6 {
     border-top: none !important;
     border-radius: 0 0 8px 8px !important;
     padding: 16px !important;
+    color: var(--text) !important;
+}
+.stTabs [data-baseweb="tab-panel"] * {
+    color: var(--text) !important;
 }
 
+/* ══════════════════════════════════════
+   CHECKBOX / LABELS
+   ══════════════════════════════════════ */
 .stCheckbox label, .stCheckbox span {
     color: var(--text-body) !important;
 }
@@ -262,6 +411,9 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 500 !important;
 }
 
+/* ══════════════════════════════════════
+   SPINNER / JSON / PLOTLY
+   ══════════════════════════════════════ */
 .stSpinner > div {
     border-color: var(--accent) !important;
 }
@@ -270,11 +422,13 @@ h1, h2, h3, h4, h5, h6 {
     background: var(--surface2) !important;
     border: 1px solid var(--border) !important;
     border-radius: 6px !important;
+    color: var(--text) !important;
 }
 
 [data-testid="stPlotlyChart"] {
     border-radius: 8px !important;
     overflow: hidden !important;
+    background: var(--surface) !important;
 }
 
 hr { border-color: var(--border) !important; }
@@ -289,6 +443,44 @@ hr { border-color: var(--border) !important; }
 [data-testid="stPlotlyChart"] svg .g-ytitle text,
 [data-testid="stPlotlyChart"] svg .legendtext {
     fill: #1a2332 !important;
+}
+
+/* ══════════════════════════════════════
+   MAIN BLOCK CONTAINER BACKGROUND
+   ══════════════════════════════════════ */
+[data-testid="block-container"],
+[data-testid="stVerticalBlock"],
+[data-testid="stHorizontalBlock"],
+section[data-testid="stSidebar"] > div,
+.main .block-container {
+    background: var(--bg) !important;
+}
+
+/* ══════════════════════════════════════
+   IFRAME (Arrow tables rendered inside iframes)
+   ══════════════════════════════════════ */
+iframe[title="st_aggrid.agGrid"],
+iframe[data-testid] {
+    background: var(--surface) !important;
+    border-radius: 8px !important;
+}
+
+/* ══════════════════════════════════════
+   SCROLLBAR
+   ══════════════════════════════════════ */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--surface2); border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* ══════════════════════════════════════
+   MARKDOWN / CODE BLOCKS
+   ══════════════════════════════════════ */
+code, pre {
+    background: var(--surface2) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 4px !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -398,12 +590,6 @@ def can_stratify(y):
 
 # ── Helper: encode target for sklearn ─────────────────────────────────────────
 def encode_target(y_series, problem_type):
-    """
-    Returns (y_encoded, label_encoder_or_None).
-    For regression: tries numeric cast; if the column is string-typed,
-    raises a clear ValueError so callers can show a friendly message.
-    For classification: label-encodes strings automatically.
-    """
     from sklearn.preprocessing import LabelEncoder
     y = y_series.fillna(0) if problem_type != "Classification" else y_series
 
@@ -418,7 +604,6 @@ def encode_target(y_series, problem_type):
                 le = LabelEncoder()
                 return le.fit_transform(y.astype(str)), le
     else:
-        # Regression — target must be numeric
         if not pd.api.types.is_numeric_dtype(y):
             raise ValueError(
                 f"The selected target column contains non-numeric values "
@@ -514,6 +699,7 @@ def apply_axis_style(fig, xaxis_title="", yaxis_title=""):
         )
     )
     return fig
+
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -625,7 +811,6 @@ elif st.session_state.step == 1:
                                letter-spacing:1.5px;font-weight:600;margin:16px 0 8px;">TARGET VARIABLE</div>""",
                             unsafe_allow_html=True)
 
-                # For Regression, highlight numeric columns as recommended
                 pt = st.session_state.problem_type
                 all_cols = df.columns.tolist()
                 numeric_cols_all = df.select_dtypes(include=np.number).columns.tolist()
@@ -635,7 +820,6 @@ elif st.session_state.step == 1:
 
                 target = st.selectbox("Select the column to predict", all_cols)
 
-                # Warn immediately if regression target is non-numeric
                 if pt == "Regression" and not pd.api.types.is_numeric_dtype(df[target]):
                     st.warning(
                         f"⚠️ Column **'{target}'** contains text values. "
@@ -669,7 +853,13 @@ elif st.session_state.step == 1:
                         pca = PCA(n_components=n_comp)
                         comp = pca.fit_transform(Xs)
 
-                        y_col = df_sub[target].astype(str)
+                        # ── FIX: bin continuous target for PCA legend to avoid hundreds of legend items ──
+                        y_raw = df_sub[target]
+                        if pd.api.types.is_numeric_dtype(y_raw):
+                            y_col = pd.cut(y_raw, bins=6, precision=0).astype(str)
+                        else:
+                            y_col = y_raw.astype(str)
+
                         if n_comp == 2:
                             fig = px.scatter(x=comp[:,0], y=comp[:,1], color=y_col,
                                              labels={"x":"PC1","y":"PC2","color": target},
@@ -733,6 +923,7 @@ elif st.session_state.step == 1:
         if st.button("← Back", key="back1"):
             st.session_state.step = 0
             st.rerun()
+
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -957,6 +1148,7 @@ elif st.session_state.step == 2:
                 st.session_state.step = 3; st.rerun()
 
 
+
 # ══════════════════════════════════════════════════════════════════════════════
 # STEP 3 — DATA ENGINEERING & CLEANING
 # ══════════════════════════════════════════════════════════════════════════════
@@ -1113,6 +1305,7 @@ elif st.session_state.step == 3:
             st.session_state.step = 4; st.rerun()
 
 
+
 # ══════════════════════════════════════════════════════════════════════════════
 # STEP 4 — FEATURE SELECTION
 # ══════════════════════════════════════════════════════════════════════════════
@@ -1253,12 +1446,9 @@ elif st.session_state.step == 4:
             X_mi = df[numeric_cols].fillna(0)
             y_mi = df[target]
 
-            # ── FIX: always use the right MI function and encode target if needed ──
             target_is_numeric = pd.api.types.is_numeric_dtype(y_mi)
 
             if pt == "Classification" or not target_is_numeric:
-                # For classification OR when target is a string in regression mode,
-                # use classif-flavoured MI (treats target as discrete)
                 from sklearn.preprocessing import LabelEncoder
                 if not target_is_numeric:
                     le_mi = LabelEncoder()
@@ -1270,7 +1460,6 @@ elif st.session_state.step == 4:
                 except Exception:
                     mi = mutual_info_regression(X_mi, y_mi_enc, random_state=42)
             else:
-                # Regression with numeric target
                 mi = mutual_info_regression(X_mi, y_mi.fillna(0), random_state=42)
 
             mi_series = pd.Series(mi, index=numeric_cols).sort_values(ascending=False)
@@ -1342,6 +1531,7 @@ elif st.session_state.step == 4:
             st.session_state.step = 5; st.rerun()
 
 
+
 # ══════════════════════════════════════════════════════════════════════════════
 # STEP 5 — DATA SPLIT
 # ══════════════════════════════════════════════════════════════════════════════
@@ -1353,7 +1543,6 @@ elif st.session_state.step == 5:
     pt = st.session_state.problem_type
     features = st.session_state.selected_features or [c for c in df.select_dtypes(include=np.number).columns if c != target]
 
-    # Warn if regression target is non-numeric before split
     if pt == "Regression" and not pd.api.types.is_numeric_dtype(df[target]):
         st.error(
             f"❌ Target column **'{target}'** contains text values (e.g. '{df[target].dropna().iloc[0]}').\n\n"
@@ -1527,6 +1716,7 @@ elif st.session_state.step == 6:
                 st.session_state.step = 7; st.rerun()
 
 
+
 # ══════════════════════════════════════════════════════════════════════════════
 # STEP 7 — TRAINING & K-FOLD VALIDATION
 # ══════════════════════════════════════════════════════════════════════════════
@@ -1554,7 +1744,6 @@ elif st.session_state.step == 7:
                 sc = StandardScaler()
                 Xs = sc.fit_transform(X_train.fillna(0))
 
-                # ── FIX: encode target robustly for both classification and regression ──
                 try:
                     ys, le = encode_target(y_train, pt)
                 except ValueError as enc_err:
@@ -1694,6 +1883,7 @@ elif st.session_state.step == 7:
                 st.session_state.step = 8; st.rerun()
 
 
+
 # ══════════════════════════════════════════════════════════════════════════════
 # STEP 8 — PERFORMANCE METRICS
 # ══════════════════════════════════════════════════════════════════════════════
@@ -1715,10 +1905,8 @@ elif st.session_state.step == 8:
         X_train_s = sc.fit_transform(X_train.fillna(0))
         X_test_s = sc.transform(X_test.fillna(0))
 
-        # ── FIX: use shared encode_target helper ──
         try:
             y_train_enc, _le_train = encode_target(y_train, pt)
-            # For test set in classification, reuse the same label encoder fitted on train
             if pt == "Classification" and _le_train is not None:
                 y_test_enc = _le_train.transform(y_test.fillna("").astype(str))
             else:
@@ -1902,7 +2090,6 @@ elif st.session_state.step == 9:
         sc = StandardScaler()
         X_train_s = sc.fit_transform(X_train.fillna(0))
 
-        # ── FIX: use shared encode_target helper ──
         try:
             y_enc, _le = encode_target(y_train, pt)
         except ValueError as enc_err:
