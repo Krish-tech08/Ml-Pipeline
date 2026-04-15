@@ -307,7 +307,7 @@ def card(content_fn, title="", accent="var(--accent)"):
 
 
 # ── Stepper ────────────────────────────────────────────────────────────────────
-def step_badge(n, label, done=False, active=False):
+def step_badge(n, line1, line2, done=False, active=False):
     if active:
         bg, col, border = "var(--accent)", "#ffffff", "var(--accent)"
     elif done:
@@ -317,34 +317,48 @@ def step_badge(n, label, done=False, active=False):
 
     label_col = "#ffffff" if active else ("var(--accent2)" if done else "var(--muted)")
 
+    label_html = f'<span style="display:block;">{line1}</span>'
+    if line2:
+        label_html += f'<span style="display:block;">{line2}</span>'
+
     return f"""
-    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;min-width:90px;">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;min-width:84px;max-width:96px;">
         <div style="width:38px;height:38px;border-radius:50%;background:{bg};border:2px solid {border};
                     display:flex;align-items:center;justify-content:center;
-                    font-family:Inter,sans-serif;font-weight:700;font-size:13px;color:{col};">
+                    font-family:Inter,sans-serif;font-weight:700;font-size:13px;color:{col};flex-shrink:0;">
             {'✓' if done else str(n)}
         </div>
-        <span style="font-size:10px;color:{label_col};text-align:center;font-weight:600;line-height:1.3;letter-spacing:0.2px;">{label}</span>
+        <span style="font-size:10px;color:{label_col};text-align:center;font-weight:600;line-height:1.35;letter-spacing:0.2px;">
+            {label_html}
+        </span>
     </div>"""
 
 
 def connector(done=False):
     col = "var(--accent2)" if done else "var(--border)"
-    return f'<div style="flex:1;height:2px;background:{col};margin-top:-14px;"></div>'
+    return f'<div style="flex:1;height:2px;background:{col};margin-top:-30px;min-width:8px;"></div>'
 
 
+# Two-line labels: (line1, line2)
 STEPS = [
-    "Problem\nType", "Data\nInput", "EDA", "Engineering\n& Cleaning",
-    "Feature\nSelection", "Data\nSplit", "Model\nSelection",
-    "Training &\nValidation", "Metrics", "Hyper-\nParameter Tuning"
+    ("Problem", "Type"),
+    ("Data", "Input"),
+    ("EDA", ""),
+    ("Engineering", "& Cleaning"),
+    ("Feature", "Selection"),
+    ("Data", "Split"),
+    ("Model", "Selection"),
+    ("Training &", "Validation"),
+    ("Metrics", ""),
+    ("Hyper-Parameter", "Tuning"),
 ]
 
 def render_stepper(current_step):
     html = '<div style="display:flex;align-items:flex-start;gap:0;padding:16px 10px;overflow-x:auto;">'
-    for i, label in enumerate(STEPS):
+    for i, (l1, l2) in enumerate(STEPS):
         done = i < current_step
         active = i == current_step
-        html += step_badge(i + 1, label, done, active)
+        html += step_badge(i + 1, l1, l2, done, active)
         if i < len(STEPS) - 1:
             html += connector(done)
     html += '</div>'
